@@ -1,1 +1,1 @@
-EventApp - Organize and join events without sign up!
+# EventApp - Organize and join events without sign up!
