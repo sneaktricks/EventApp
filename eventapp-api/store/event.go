@@ -9,6 +9,7 @@ import (
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -22,6 +23,7 @@ type EventStore interface {
 	FindAll(ctx context.Context, params query.PaginationParams) (events []model.EventResponse, err error)
 	FindByID(ctx context.Context, id uuid.UUID) (event model.EventResponse, err error)
 	Create(ctx context.Context, ec *model.EventCreate) (event model.EventCreateResponse, err error)
+	FindEventIDByAdminCode(ctx context.Context, adminCode string) (eventID uuid.UUID, err error)
 }
 
 type GormEventStore struct {
@@ -119,6 +121,7 @@ func (es *GormEventStore) Create(ctx context.Context, ec *model.EventCreate) (ev
 		ParticipationEndsAt:   ec.ParticipationEndsAt,
 		Visibility:            ec.Visibility,
 		AdminCode:             b64EncodedAdminCodeHash,
+		ExpiresAt:             ec.ExpiresAt,
 	}
 	err = e.WithContext(ctx).Create(&dbEvent)
 	if err != nil {
@@ -142,4 +145,24 @@ func (es *GormEventStore) Create(ctx context.Context, ec *model.EventCreate) (ev
 	}
 
 	return event, nil
+}
+
+func (es *GormEventStore) FindEventIDByAdminCode(ctx context.Context, adminCode string) (eventID uuid.UUID, err error) {
+	e := es.query.Event
+
+	hash, err := admincode.DeriveHash(adminCode)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	b64EncodedAdminCodeHash := base64.StdEncoding.EncodeToString(hash)
+
+	event, err := e.WithContext(ctx).Where(e.AdminCode.Eq(b64EncodedAdminCodeHash), e.ExpiresAt.Gt(time.Now())).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return uuid.UUID{}, ErrEventNotFound
+		}
+		return uuid.UUID{}, err
+	}
+
+	return event.ID, nil
 }

@@ -12,7 +12,6 @@ import {
   eventCreateResponseSchema,
   participationCreateResponseSchema,
 } from "./schemas";
-import { cookies } from "next/headers";
 
 export type ActionResponse = {
   message: string;
@@ -114,16 +113,39 @@ export const submitParticipation = async (
 export const submitEventAdminCode = async (
   code: string
 ): Promise<ActionResponse> => {
-  console.log(code);
-  if (code === "123456-ABCDEF-123456") {
-    cookies().set("adminCode", code, {
-      httpOnly: false,
-      expires: Date.now() + 1000 * 60 * 60,
+  let eventId: string;
+  try {
+    const url = `${process.env.API_URL}/events/find-by-admin-code`;
+    const resp = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: code,
+      },
     });
-    redirect("/events/create");
-  } else {
-    return { message: "The code is incorrect" };
+    if (!resp.ok) {
+      if (resp.status === 404) {
+        return {
+          message: "No event was found by the provided code or it has expired",
+        };
+      }
+      console.error(`GET ${url} returned a non-ok status code`);
+      return {
+        message:
+          "Failed to participate: API responded with a non-ok status code",
+      };
+    }
+    const body = await resp.json();
+    if (body.eventId) {
+      eventId = body.eventId;
+    } else {
+      return { message: "API responded with an unexpected format" };
+    }
+  } catch (e) {
+    console.error("Failed to fetch event", e);
+    return { message: "Failed to fetch event" };
   }
+  redirect(`/events/${eventId}/edit`);
 };
 
 export const submitParticipationAdminCode = async (

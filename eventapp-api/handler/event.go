@@ -60,3 +60,23 @@ func (h *Handler) CreateEvent(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, event)
 }
+
+func (h *Handler) FindEventByAdminCode(c echo.Context) error {
+	header := c.Request().Header
+	adminCode := header.Get("Authorization")
+	if adminCode == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Authorization header must be present")
+	}
+
+	eventID, err := h.eventStore.FindEventIDByAdminCode(c.Request().Context(), adminCode)
+	if err != nil {
+		switch err {
+		case store.ErrEventNotFound:
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve event")
+		}
+	}
+
+	return c.JSON(http.StatusOK, map[string]uuid.UUID{"eventId": eventID})
+}

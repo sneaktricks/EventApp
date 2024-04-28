@@ -10,15 +10,21 @@ import (
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+)
+
+var (
+	ErrParticipationNotFound = errors.New("participation not found")
 )
 
 type ParticipationStore interface {
 	FindAllInEvent(ctx context.Context, eventID uuid.UUID, params query.PaginationParams) (participations model.Participations, err error)
 	FindParticipantCountsByEventID(ctx context.Context, eventIDs uuid.UUIDs) (participationCounts map[uuid.UUID]int64, err error)
 	Create(ctx context.Context, eventID uuid.UUID, pc *model.ParticipationCreate) (participation model.ParticipationCreateResponse, err error)
+	FindParticipationIDByAdminCode(ctx context.Context, adminCode string) (participationID uuid.UUID, err error)
 	// Delete(ctx context.Context, id uuid.UUID, adminCode string) error
 }
 
@@ -162,4 +168,35 @@ func (ps *GormParticipationStore) FindParticipantCountsByEventID(ctx context.Con
 	}
 
 	return participationCounts, nil
+}
+
+func (ps *GormParticipationStore) FindParticipationIDByAdminCode(ctx context.Context, adminCode string) (participationID uuid.UUID, err error) {
+	e := ps.query.Event
+	p := ps.query.Participation
+
+	hash, err := admincode.DeriveHash(adminCode)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	b64EncodedAdminCodeHash := base64.StdEncoding.EncodeToString(hash)
+
+	participation, err := p.WithContext(ctx).Where(p.AdminCode.Eq(b64EncodedAdminCodeHash)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return uuid.UUID{}, ErrParticipationNotFound
+		}
+		return uuid.UUID{}, err
+	}
+	event, err := e.WithContext(ctx).Where(e.ID.Eq(participation.EventID)).First()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return uuid.UUID{}, ErrParticipationNotFound
+		}
+		return uuid.UUID{}, err
+	}
+	if event.ExpiresAt.Before(time.Now()) {
+		return uuid.UUID{}, ErrParticipationNotFound
+	}
+
+	return participation.ID, nil
 }

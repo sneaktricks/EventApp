@@ -26,4 +26,5 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 	eventGroup.GET("/:id/participants", h.FindParticipantsByEventID)
 	eventGroup.POST("/:id/participate", h.CreateParticipation)
 	eventGroup.GET("/participant-counts", h.FindParticipantCountsByEventID)
+	eventGroup.GET("/find-by-admin-code", h.FindEventByAdminCode)
 }
