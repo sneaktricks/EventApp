@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  database:
+    container_name: eventapp-postgres-database
+    image: postgres:16.2
+    shm_size: 128mb
+    env_file:
+      - project.env
+  eventapp-api:
+    image: eventapp-api
+    build:
+      context: ./eventapp-api
+      dockerfile: Dockerfile
+    env_file:
+      - project.env
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+  eventapp-ui:
+    image: eventapp-ui
+    build:
+      context: ./eventapp-ui
+      dockerfile: Dockerfile
+    environment:
+      - API_URL=http://eventapp-api:8080
+    ports:
+      - 3000:3000
+    depends_on:
+      - eventapp-api

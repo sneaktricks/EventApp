@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  @apply bg-slate-100;
+  @apply text-black;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @apply bg-slate-900;
+    @apply text-slate-100;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
