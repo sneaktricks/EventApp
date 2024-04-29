@@ -12,6 +12,8 @@ import {
   eventCreateResponseSchema,
   participationCreateResponseSchema,
 } from "./schemas";
+import { cookies } from "next/headers";
+import { encryptEvent } from "./session";
 
 export type ActionResponse = {
   message: string;
@@ -145,6 +147,8 @@ export const submitEventAdminCode = async (
     console.error("Failed to fetch event", e);
     return { message: "Failed to fetch event" };
   }
+
+  cookies().set("event-auth", await encryptEvent({ eventId, adminCode: code }));
   redirect(`/events/${eventId}/edit`);
 };
 

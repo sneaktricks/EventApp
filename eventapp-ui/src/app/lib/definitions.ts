@@ -100,3 +100,8 @@ export interface IParticipationCreateResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface SessionPayload {
+  eventId: string;
+  adminCode: string;
+}
