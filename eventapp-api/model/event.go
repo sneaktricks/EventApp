@@ -94,7 +94,6 @@ type EventEditResponse struct {
 	ParticipationStartsAt time.Time `json:"participationStartsAt"`
 	ParticipationEndsAt   time.Time `json:"participationEndsAt"`
 	Visibility            string    `json:"visibility"`
-	AdminCode             string    `json:"adminCode"`
 	CreatedAt             time.Time `json:"createdAt"`
 	UpdatedAt             time.Time `json:"updatedAt"`
 	ExpiresAt             time.Time `json:"expiresAt"`
