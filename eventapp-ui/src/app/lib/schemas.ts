@@ -4,7 +4,6 @@ import {
   IEventAdminSessionResponse,
   IEventCreateResponse,
   IEventEditInputs,
-  IEventEditResponse,
   IEventInputs,
   IParticipation,
   IParticipationCreate,
@@ -79,7 +78,7 @@ export const eventResponseSchema: ZodSchema<IEvent> = z.object({
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date(),
   participantCount: z.coerce.number().int(),
-  participantLimit: z.optional(z.coerce.number().int()),
+  participantLimit: z.nullable(z.coerce.number().int()),
   participationStartsAt: z.coerce.date(),
   participationEndsAt: z.coerce.date(),
   visibility: z.string(),
@@ -157,22 +156,6 @@ export const eventAdminSessionResponseSchema: ZodSchema<IEventAdminSessionRespon
     eventId: z.string(),
     adminToken: z.string(),
   });
-
-export const eventEditResponseSchema: ZodSchema<IEventEditResponse> = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  location: z.string(),
-  startsAt: z.coerce.date(),
-  endsAt: z.coerce.date(),
-  participantLimit: z.optional(z.coerce.number().int()),
-  participationStartsAt: z.coerce.date(),
-  participationEndsAt: z.coerce.date(),
-  visibility: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  expiresAt: z.coerce.date(),
-});
 
 export const getEventEditFormSchema = (
   eventData: IEvent

@@ -3,12 +3,21 @@ package admincode
 import (
 	"crypto/rand"
 	"errors"
+	"log"
 	"math/big"
 	"os"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/argon2"
 )
+
+type Argon2Params struct {
+	Time      uint32
+	Memory    uint32
+	Threads   uint8
+	KeyLength uint32
+}
 
 const (
 	Characters     = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -18,6 +27,13 @@ const (
 var (
 	ErrPepperNotDefined = errors.New("admincode: environment variable ADMINCODE_PEPPER is not set")
 )
+
+var argon2Config = Argon2Params{
+	Time:      5,
+	Memory:    64 * 1024,
+	Threads:   2,
+	KeyLength: 64,
+}
 
 func Generate() (code string, err error) {
 	var sb strings.Builder
@@ -52,7 +68,9 @@ func DeriveHash(code string) (hash []byte, err error) {
 	if !ok {
 		return nil, ErrPepperNotDefined
 	}
-	// TODO: Replace hardcoded parameters with configurable variables
-	hash = argon2.IDKey([]byte(code), []byte(pepper), 2, 64*1024, 2, 64)
+	start := time.Now()
+	hash = argon2.IDKey([]byte(code), []byte(pepper), argon2Config.Time, argon2Config.Memory, argon2Config.Threads, argon2Config.KeyLength)
+	end := time.Now()
+	log.Printf("admincode: Hashing took %s\n", end.Sub(start).String())
 	return hash, nil
 }

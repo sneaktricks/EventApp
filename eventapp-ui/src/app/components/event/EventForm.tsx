@@ -134,7 +134,7 @@ const EventForm = () => {
           <div className="grid gap-1">
             <DateTimeField
               label="For security, set an expiration date and time for your event."
-              error={form.formState.errors.participationEndsAt}
+              error={form.formState.errors.expiresAt}
               {...form.register("expiresAt")}
             />
             <p className="text-xs text-gray-600 dark:text-gray-400">

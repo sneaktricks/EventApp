@@ -5,6 +5,7 @@ import (
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"example/eventapi/store"
+	"log"
 	"log/slog"
 	"net/http"
 
@@ -20,6 +21,7 @@ func (h *Handler) FindAllEvents(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve events")
 	}
+	log.Printf("%#v\n", events)
 	return c.JSON(http.StatusOK, events)
 }
 
@@ -110,7 +112,7 @@ func (h *Handler) EditEvent(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Path variable id and token subject don't match")
 	}
 
-	event, err := h.eventStore.Edit(c.Request().Context(), id, &editData)
+	err = h.eventStore.Edit(c.Request().Context(), id, &editData)
 	if err != nil {
 		switch err {
 		case store.ErrEventNotFound:
@@ -119,5 +121,5 @@ func (h *Handler) EditEvent(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to edit event")
 		}
 	}
-	return c.JSON(http.StatusOK, event)
+	return c.NoContent(http.StatusNoContent)
 }

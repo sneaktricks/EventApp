@@ -24,7 +24,7 @@ type EventStore interface {
 	FindByID(ctx context.Context, id uuid.UUID) (event model.EventResponse, err error)
 	Create(ctx context.Context, createData *model.EventCreate) (event model.EventCreateResponse, err error)
 	FindEventIDByAdminCode(ctx context.Context, adminCode string) (eventID uuid.UUID, err error)
-	Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) (event model.EventEditResponse, err error)
+	Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) error
 }
 
 type GormEventStore struct {
@@ -168,7 +168,7 @@ func (es *GormEventStore) FindEventIDByAdminCode(ctx context.Context, adminCode 
 	return event.ID, nil
 }
 
-func (es *GormEventStore) Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) (event model.EventEditResponse, err error) {
+func (es *GormEventStore) Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) error {
 	e := es.query.Event
 
 	dbEvent := model.Event{
@@ -184,27 +184,11 @@ func (es *GormEventStore) Edit(ctx context.Context, eventID uuid.UUID, editData 
 	}
 	result, err := e.WithContext(ctx).Where(e.ID.Eq(eventID)).Updates(dbEvent)
 	if err != nil {
-		return model.EventEditResponse{}, err
+		return err
 	}
 	if result.RowsAffected == 0 {
-		return model.EventEditResponse{}, ErrEventNotFound
+		return ErrEventNotFound
 	}
 
-	event = model.EventEditResponse{
-		ID:                    dbEvent.ID,
-		Name:                  dbEvent.Name,
-		Description:           dbEvent.Description,
-		Location:              dbEvent.Location,
-		StartsAt:              dbEvent.StartsAt,
-		EndsAt:                dbEvent.EndsAt,
-		ParticipantLimit:      dbEvent.ParticipantLimit,
-		ParticipationStartsAt: dbEvent.ParticipationStartsAt,
-		ParticipationEndsAt:   dbEvent.ParticipationEndsAt,
-		Visibility:            dbEvent.Visibility,
-		CreatedAt:             dbEvent.CreatedAt,
-		UpdatedAt:             dbEvent.UpdatedAt,
-		ExpiresAt:             dbEvent.ExpiresAt,
-	}
-
-	return event, nil
+	return nil
 }

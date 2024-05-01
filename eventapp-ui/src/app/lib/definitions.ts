@@ -130,19 +130,3 @@ export interface IEventEditInputs {
   participationEndsAt: Date;
   visibility: EventVisibility;
 }
-
-export interface IEventEditResponse {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  startsAt: Date;
-  endsAt: Date;
-  participantLimit?: number | null;
-  participationStartsAt: Date;
-  participationEndsAt: Date;
-  visibility: string;
-  createdAt: Date;
-  updatedAt: Date;
-  expiresAt: Date;
-}

@@ -48,7 +48,7 @@ func NewEventAdminSession(eventID uuid.UUID) (token string, err error) {
 
 func VerifyEventAdminToken(tokenString string) (eventID uuid.UUID, err error) {
 	// Parse token
-	token, err := jwt.ParseWithClaims(tokenString, jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	},
 		// Ensure that the signing method, issuer, and audience are valid.
@@ -62,6 +62,7 @@ func VerifyEventAdminToken(tokenString string) (eventID uuid.UUID, err error) {
 	if err != nil {
 		return uuid.UUID{}, err
 	}
+
 	// Check for validity
 	if !token.Valid {
 		return uuid.UUID{}, ErrInvalidToken
@@ -76,11 +77,10 @@ func VerifyEventAdminToken(tokenString string) (eventID uuid.UUID, err error) {
 		return uuid.UUID{}, ErrInvalidToken
 	}
 
-	// Parse subject into eventID
 	eventID, err = uuid.Parse(strings.TrimPrefix(subject, "Event:"))
 	if err != nil {
 		return uuid.UUID{}, err
 	}
 
-	return eventID, nil
+	return eventID, err
 }

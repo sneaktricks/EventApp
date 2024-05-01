@@ -12,7 +12,7 @@ import Checkbox from "@/app/components/common/input/Checkbox";
 import NumberInput from "@/app/components/common/input/NumberInput";
 import RadioGroup from "@/app/components/common/input/RadioGroup";
 import { SparklesIcon } from "@heroicons/react/24/solid";
-import { eventCreateFormSchema } from "@/app/lib/schemas";
+import { getEventEditFormSchema } from "@/app/lib/schemas";
 import { IEvent, IEventEditInputs } from "@/app/lib/definitions";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 
@@ -23,7 +23,7 @@ export interface EventEditFormProps {
 const EventEditForm = ({ eventData }: EventEditFormProps) => {
   const form = useForm<IEventEditInputs>({
     mode: "all",
-    resolver: zodResolver(eventCreateFormSchema),
+    resolver: zodResolver(getEventEditFormSchema(eventData)),
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitResponse, setSubmitResponse] = useState<ActionResponse | null>(
