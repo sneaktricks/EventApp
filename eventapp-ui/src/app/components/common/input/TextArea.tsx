@@ -13,9 +13,9 @@ export interface TextAreaProps
 }
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ name, label, error, ...props }, ref) => {
+  ({ label, error, ...props }, ref) => {
     const text = useWatch({
-      name: name,
+      name: props.name,
       defaultValue: props.defaultValue ?? "",
     });
     return (

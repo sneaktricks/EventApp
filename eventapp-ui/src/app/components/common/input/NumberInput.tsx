@@ -12,9 +12,9 @@ export interface NumberInputProps
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ name, label, error, unit, ...props }, ref) => {
+  ({ label, error, unit, ...props }, ref) => {
     const value = useWatch({
-      name: name,
+      name: props.name,
       defaultValue: props.defaultValue ?? 1,
     });
 

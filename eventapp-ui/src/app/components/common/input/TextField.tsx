@@ -11,9 +11,9 @@ export interface TextFieldProps
 }
 
 const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
-  ({ name, label, error, ...props }, ref) => {
+  ({ label, error, ...props }, ref) => {
     const text = useWatch({
-      name: name,
+      name: props.name,
       defaultValue: props.defaultValue ?? "",
     });
     return (

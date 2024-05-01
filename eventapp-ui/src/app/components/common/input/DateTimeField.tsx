@@ -11,7 +11,7 @@ export interface DateTimeFieldProps
 }
 
 const DateTimeField = React.forwardRef<HTMLInputElement, DateTimeFieldProps>(
-  ({ name, label, error, ...props }, ref) => {
+  ({ label, error, ...props }, ref) => {
     return (
       <div className="grid gap-1">
         <div className="">{label}</div>

@@ -10,7 +10,7 @@ export interface CheckboxProps
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ name, label, error, ...props }, ref) => {
+  ({ label, error, ...props }, ref) => {
     return (
       <div className="grid gap-1">
         <div className="flex items-center">
