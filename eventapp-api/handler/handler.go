@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"example/eventapi/middleware"
 	"example/eventapi/store"
 
 	"github.com/labstack/echo/v4"
@@ -26,5 +27,6 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 	eventGroup.GET("/:id/participants", h.FindParticipantsByEventID)
 	eventGroup.POST("/:id/participate", h.CreateParticipation)
 	eventGroup.GET("/participant-counts", h.FindParticipantCountsByEventID)
-	eventGroup.GET("/find-by-admin-code", h.RequestEventAdminSession)
+	eventGroup.GET("/request-admin-session-token", h.RequestEventAdminSession)
+	eventGroup.PUT("/:id/edit", h.EditEvent, middleware.JWTMiddleware)
 }

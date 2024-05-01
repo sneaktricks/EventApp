@@ -101,7 +101,7 @@ export interface IParticipationCreateResponse {
   updatedAt: Date;
 }
 
-export interface SessionPayload {
+export interface IEventAdminSessionResponse {
   eventId: string;
-  adminCode: string;
+  adminToken: string;
 }

@@ -70,3 +70,32 @@ type EventResponse struct {
 	CreatedAt             time.Time `json:"createdAt"`
 	UpdatedAt             time.Time `json:"updatedAt"`
 }
+
+type EventEdit struct {
+	Name                  string    `json:"name" validate:"required,max=50"`
+	Description           string    `json:"description" validate:"required,max=3000"`
+	Location              string    `json:"location" validate:"required,max=100"`
+	StartsAt              time.Time `json:"startsAt" validate:"required"`
+	EndsAt                time.Time `json:"endsAt" validate:"required,gte,gtfield=StartsAt"`
+	ParticipantLimit      *int64    `json:"participantLimit" validate:"omitnil,min=1"`
+	ParticipationStartsAt time.Time `json:"participationStartsAt" validate:"required"`
+	ParticipationEndsAt   time.Time `json:"participationEndsAt" validate:"required,gte,gtfield=ParticipationStartsAt"`
+	Visibility            string    `json:"visibility" validate:"oneof=public private"`
+}
+
+type EventEditResponse struct {
+	ID                    uuid.UUID `json:"id"`
+	Name                  string    `json:"name"`
+	Description           string    `json:"description"`
+	Location              string    `json:"location"`
+	StartsAt              time.Time `json:"startsAt"`
+	EndsAt                time.Time `json:"endsAt"`
+	ParticipantLimit      *int64    `json:"participantLimit"`
+	ParticipationStartsAt time.Time `json:"participationStartsAt"`
+	ParticipationEndsAt   time.Time `json:"participationEndsAt"`
+	Visibility            string    `json:"visibility"`
+	AdminCode             string    `json:"adminCode"`
+	CreatedAt             time.Time `json:"createdAt"`
+	UpdatedAt             time.Time `json:"updatedAt"`
+	ExpiresAt             time.Time `json:"expiresAt"`
+}

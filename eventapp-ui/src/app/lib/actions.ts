@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import {
+  IEventAdminSessionResponse,
   IEventCreate,
   IEventCreateResponse,
   IParticipationCreate,
@@ -9,11 +10,11 @@ import {
 } from "./definitions";
 import { revalidateTag } from "next/cache";
 import {
+  eventAdminSessionResponseSchema,
   eventCreateResponseSchema,
   participationCreateResponseSchema,
 } from "./schemas";
 import { cookies } from "next/headers";
-import { encryptEvent } from "./session";
 
 export type ActionResponse = {
   message: string;
@@ -115,9 +116,9 @@ export const submitParticipation = async (
 export const submitEventAdminCode = async (
   code: string
 ): Promise<ActionResponse> => {
-  let eventId: string;
+  let eventAdminSessionResponse: IEventAdminSessionResponse;
   try {
-    const url = `${process.env.API_URL}/events/find-by-admin-code`;
+    const url = `${process.env.API_URL}/events/request-admin-session-token`;
     const resp = await fetch(url, {
       method: "GET",
       headers: {
@@ -138,18 +139,25 @@ export const submitEventAdminCode = async (
       };
     }
     const body = await resp.json();
-    if (body.eventId) {
-      eventId = body.eventId;
-    } else {
-      return { message: "API responded with an unexpected format" };
+    const parseResult = eventAdminSessionResponseSchema.safeParse(body);
+    if (!parseResult.success) {
+      console.error(
+        "Received a malformed event admin session response",
+        parseResult.error
+      );
+      return {
+        message:
+          "Received an unexpected response from the server. Please try again in a moment.",
+      };
     }
+    eventAdminSessionResponse = parseResult.data;
   } catch (e) {
     console.error("Failed to fetch event", e);
     return { message: "Failed to fetch event" };
   }
 
-  cookies().set("event-auth", await encryptEvent({ eventId, adminCode: code }));
-  redirect(`/events/${eventId}/edit`);
+  cookies().set("event-auth-admin-token", eventAdminSessionResponse.adminToken);
+  redirect(`/events/${eventAdminSessionResponse.eventId}/edit`);
 };
 
 export const submitParticipationAdminCode = async (

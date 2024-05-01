@@ -22,8 +22,9 @@ var (
 type EventStore interface {
 	FindAll(ctx context.Context, params query.PaginationParams) (events []model.EventResponse, err error)
 	FindByID(ctx context.Context, id uuid.UUID) (event model.EventResponse, err error)
-	Create(ctx context.Context, ec *model.EventCreate) (event model.EventCreateResponse, err error)
+	Create(ctx context.Context, createData *model.EventCreate) (event model.EventCreateResponse, err error)
 	FindEventIDByAdminCode(ctx context.Context, adminCode string) (eventID uuid.UUID, err error)
+	Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) (event model.EventEditResponse, err error)
 }
 
 type GormEventStore struct {
@@ -97,7 +98,7 @@ func (es *GormEventStore) FindByID(ctx context.Context, id uuid.UUID) (event mod
 	return event, nil
 }
 
-func (es *GormEventStore) Create(ctx context.Context, ec *model.EventCreate) (event model.EventCreateResponse, err error) {
+func (es *GormEventStore) Create(ctx context.Context, createData *model.EventCreate) (event model.EventCreateResponse, err error) {
 	// Generate and encode edit code
 	adminCode, err := admincode.Generate()
 	if err != nil {
@@ -111,17 +112,17 @@ func (es *GormEventStore) Create(ctx context.Context, ec *model.EventCreate) (ev
 
 	e := es.query.Event
 	dbEvent := model.Event{
-		Name:                  ec.Name,
-		Description:           ec.Description,
-		Location:              ec.Location,
-		StartsAt:              ec.StartsAt,
-		EndsAt:                ec.EndsAt,
-		ParticipantLimit:      ec.ParticipantLimit,
-		ParticipationStartsAt: ec.ParticipationStartsAt,
-		ParticipationEndsAt:   ec.ParticipationEndsAt,
-		Visibility:            ec.Visibility,
+		Name:                  createData.Name,
+		Description:           createData.Description,
+		Location:              createData.Location,
+		StartsAt:              createData.StartsAt,
+		EndsAt:                createData.EndsAt,
+		ParticipantLimit:      createData.ParticipantLimit,
+		ParticipationStartsAt: createData.ParticipationStartsAt,
+		ParticipationEndsAt:   createData.ParticipationEndsAt,
+		Visibility:            createData.Visibility,
 		AdminCode:             b64EncodedAdminCodeHash,
-		ExpiresAt:             ec.ExpiresAt,
+		ExpiresAt:             createData.ExpiresAt,
 	}
 	err = e.WithContext(ctx).Create(&dbEvent)
 	if err != nil {
@@ -165,4 +166,44 @@ func (es *GormEventStore) FindEventIDByAdminCode(ctx context.Context, adminCode 
 	}
 
 	return event.ID, nil
+}
+
+func (es *GormEventStore) Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) (event model.EventEditResponse, err error) {
+	e := es.query.Event
+
+	dbEvent := model.Event{
+		Name:                  editData.Name,
+		Description:           editData.Description,
+		Location:              editData.Location,
+		StartsAt:              editData.StartsAt,
+		EndsAt:                editData.EndsAt,
+		ParticipantLimit:      editData.ParticipantLimit,
+		ParticipationStartsAt: editData.ParticipationStartsAt,
+		ParticipationEndsAt:   editData.ParticipationEndsAt,
+		Visibility:            editData.Visibility,
+	}
+	result, err := e.WithContext(ctx).Where(e.ID.Eq(eventID)).Updates(dbEvent)
+	if err != nil {
+		return model.EventEditResponse{}, err
+	}
+	if result.RowsAffected == 0 {
+		return model.EventEditResponse{}, ErrEventNotFound
+	}
+
+	event = model.EventEditResponse{
+		ID:                    dbEvent.ID,
+		Name:                  dbEvent.Name,
+		Description:           dbEvent.Description,
+		Location:              dbEvent.Location,
+		StartsAt:              dbEvent.StartsAt,
+		EndsAt:                dbEvent.EndsAt,
+		ParticipantLimit:      dbEvent.ParticipantLimit,
+		ParticipationStartsAt: dbEvent.ParticipationStartsAt,
+		ParticipationEndsAt:   dbEvent.ParticipationEndsAt,
+		Visibility:            dbEvent.Visibility,
+		CreatedAt:             dbEvent.CreatedAt,
+		UpdatedAt:             dbEvent.UpdatedAt,
+	}
+
+	return event, nil
 }

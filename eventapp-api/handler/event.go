@@ -90,3 +90,34 @@ func (h *Handler) RequestEventAdminSession(c echo.Context) error {
 		AdminToken: adminToken,
 	})
 }
+
+func (h *Handler) EditEvent(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+	}
+
+	editData := model.EventEdit{}
+
+	if err := c.Bind(&editData); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(editData); err != nil {
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+	}
+	if tokenID := c.Get("eventId"); tokenID != id {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Path variable id and token subject don't match")
+	}
+
+	event, err := h.eventStore.Edit(c.Request().Context(), id, &editData)
+	if err != nil {
+		switch err {
+		case store.ErrEventNotFound:
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to edit event")
+		}
+	}
+	return c.JSON(http.StatusOK, event)
+}

@@ -1,6 +1,7 @@
 import { ZodSchema, z } from "zod";
 import {
   IEvent,
+  IEventAdminSessionResponse,
   IEventCreateResponse,
   IEventInputs,
   IParticipation,
@@ -147,4 +148,10 @@ export const participationCreateResponseSchema: ZodSchema<IParticipationCreateRe
     adminCode: z.string(),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
+  });
+
+export const eventAdminSessionResponseSchema: ZodSchema<IEventAdminSessionResponse> =
+  z.object({
+    eventId: z.string(),
+    adminToken: z.string(),
   });
