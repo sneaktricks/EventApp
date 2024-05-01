@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"example/eventapi/admincode"
+	"example/eventapi/auth/admincode"
 	"example/eventapi/dal"
 	"example/eventapi/model"
 	"example/eventapi/model/query"

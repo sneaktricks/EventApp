@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"example/eventapi/auth/session"
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"example/eventapi/store"
@@ -61,7 +62,7 @@ func (h *Handler) CreateEvent(c echo.Context) error {
 	return c.JSON(http.StatusCreated, event)
 }
 
-func (h *Handler) FindEventByAdminCode(c echo.Context) error {
+func (h *Handler) RequestEventAdminSession(c echo.Context) error {
 	header := c.Request().Header
 	adminCode := header.Get("Authorization")
 	if adminCode == "" {
@@ -78,5 +79,14 @@ func (h *Handler) FindEventByAdminCode(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, map[string]uuid.UUID{"eventId": eventID})
+	adminToken, err := session.NewEventAdminSession(eventID)
+	if err != nil {
+		slog.Warn("Failed to generate event admin JWT token", slog.String("error", err.Error()))
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to request event admin session")
+	}
+
+	return c.JSON(http.StatusOK, model.EventAdminSessionResponse{
+		EventID:    eventID,
+		AdminToken: adminToken,
+	})
 }
