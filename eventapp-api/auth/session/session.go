@@ -51,6 +51,7 @@ func VerifyEventAdminToken(tokenString string) (eventID uuid.UUID, err error) {
 	token, err := jwt.ParseWithClaims(tokenString, jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	},
+		// Ensure that the signing method, issuer, and audience are valid.
 		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
 		jwt.WithIssuer("EventAppAPI"),
 		jwt.WithAudience("EventAppAPI"),
