@@ -10,7 +10,7 @@ export interface CheckboxProps
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  (props, ref) => {
+  ({ name, label, error, ...props }, ref) => {
     return (
       <div className="grid gap-1">
         <div className="flex items-center">
@@ -21,10 +21,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             {...props}
           />
           <label htmlFor={props.id} className="ms-2">
-            {props.label}
+            {label}
           </label>
         </div>
-        <ValidationError error={props.error} />
+        <ValidationError error={error} />
       </div>
     );
   }

@@ -7,28 +7,30 @@ export interface RadioGroupProps
   name: string;
   label: string;
   options: Record<string, { displayedText: string; helperText?: string }>;
-  error: FieldError | undefined;
+  error?: FieldError;
+  defaultCheckedOption?: string;
 }
 
 const RadioGroup = React.forwardRef<HTMLInputElement, RadioGroupProps>(
-  (props, ref) => {
+  ({ id, label, options, defaultCheckedOption, ...props }, ref) => {
     return (
       <div className="grid gap-1">
-        <div className="">{props.label}</div>
+        <div className="">{label}</div>
         <div className="grid grid-cols-2 gap-3">
-          {Object.entries(props.options).map((o) => (
+          {Object.entries(options).map((o) => (
             <div key={o[0]} className="flex items-center">
               <input
-                id={props.id ? `${props.id}-${o[0]}` : undefined}
+                id={id ? `${id}-${o[0]}` : undefined}
                 type="radio"
                 className="border bg-zinc-900 disabled:bg-zinc-500 disabled:border-zinc-400 disabled:cursor-not-allowed"
                 ref={ref}
+                defaultChecked={defaultCheckedOption === o[0]}
                 value={o[0]}
                 {...props}
               />
               <div>
                 <label
-                  htmlFor={props.id ? `${props.id}-${o[0]}` : undefined}
+                  htmlFor={id ? `${id}-${o[0]}` : undefined}
                   className="ms-2"
                 >
                   {o[1].displayedText}

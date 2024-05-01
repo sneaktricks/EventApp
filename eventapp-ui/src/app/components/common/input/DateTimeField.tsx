@@ -11,20 +11,20 @@ export interface DateTimeFieldProps
 }
 
 const DateTimeField = React.forwardRef<HTMLInputElement, DateTimeFieldProps>(
-  (props, ref) => {
+  ({ name, label, error, ...props }, ref) => {
     return (
       <div className="grid gap-1">
-        <div className="">{props.label}</div>
+        <div className="">{label}</div>
         <input
           type="datetime-local"
           className={clsx(
             "border bg-zinc-900 disabled:bg-zinc-500 disabled:border-zinc-400 disabled:cursor-not-allowed rounded-lg p-2 w-full",
-            { "border-red-600 focus:border-red-600": !!props.error }
+            { "border-red-600 focus:border-red-600": !!error }
           )}
           ref={ref}
           {...props}
         />
-        <ValidationError error={props.error} />
+        <ValidationError error={error} />
       </div>
     );
   }

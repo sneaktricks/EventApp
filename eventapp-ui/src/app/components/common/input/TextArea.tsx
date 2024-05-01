@@ -13,24 +13,24 @@ export interface TextAreaProps
 }
 
 const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  (props, ref) => {
+  ({ name, label, error, ...props }, ref) => {
     const text = useWatch({
-      name: props.name,
+      name: name,
       defaultValue: props.defaultValue ?? "",
     });
     return (
       <div className="grid gap-1">
-        <div className="">{props.label}</div>
+        <div className="">{label}</div>
         <textarea
           className={clsx(
             "border bg-zinc-900 disabled:bg-zinc-500 disabled:border-zinc-400 disabled:cursor-not-allowed rounded-lg p-2 w-full h-40",
-            { "border-red-600": !!props.error }
+            { "border-red-600": !!error }
           )}
           ref={ref}
           {...props}
         />
         <div className="flex flex-row grow">
-          <ValidationError error={props.error} />
+          <ValidationError error={error} />
           <div className="text-right grow text-xs text-zinc-500">
             {text ? text.length : 0}/{props.maxLength}
           </div>
