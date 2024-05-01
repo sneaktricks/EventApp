@@ -203,6 +203,7 @@ func (es *GormEventStore) Edit(ctx context.Context, eventID uuid.UUID, editData 
 		Visibility:            dbEvent.Visibility,
 		CreatedAt:             dbEvent.CreatedAt,
 		UpdatedAt:             dbEvent.UpdatedAt,
+		ExpiresAt:             dbEvent.ExpiresAt,
 	}
 
 	return event, nil
