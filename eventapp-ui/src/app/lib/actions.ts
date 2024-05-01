@@ -5,6 +5,8 @@ import {
   IEventAdminSessionResponse,
   IEventCreate,
   IEventCreateResponse,
+  IEventEdit,
+  IEventEditResponse,
   IParticipationCreate,
   IParticipationCreateResponse,
 } from "./definitions";
@@ -12,6 +14,7 @@ import { revalidateTag } from "next/cache";
 import {
   eventAdminSessionResponseSchema,
   eventCreateResponseSchema,
+  eventEditResponseSchema,
   participationCreateResponseSchema,
 } from "./schemas";
 import { cookies } from "next/headers";
@@ -169,4 +172,48 @@ export const submitParticipationAdminCode = async (
   } else {
     return { message: "The code is incorrect!" };
   }
+};
+
+export const editEvent = async (
+  eventId: string,
+  editData: IEventEdit
+): Promise<ActionResponse> => {
+  let eventEditResponse: IEventEditResponse;
+  try {
+    const url = `${process.env.API_URL}/events/${eventId}/edit`;
+    const resp = await fetch(url, {
+      body: JSON.stringify(editData),
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies().get("event-auth-admin-token")}`,
+      },
+    });
+    if (!resp.ok) {
+      console.error(`PUT ${url} returned a non-ok status code`);
+      return {
+        message:
+          "Failed to create event: API responded with a non-ok status code",
+      };
+    }
+    const body = await resp.json();
+    const parseResult = eventEditResponseSchema.safeParse(body);
+    if (!parseResult.success) {
+      console.error(
+        "Received a malformed event create response",
+        parseResult.error
+      );
+      return {
+        message:
+          "Received an unexpected response from the server. Please try again in a moment.",
+      };
+    }
+    eventEditResponse = parseResult.data;
+  } catch (e) {
+    console.error("Failed to create event", e);
+    return { message: "Failed to create event" };
+  }
+
+  revalidateTag("events");
+  redirect(`/events/${eventEditResponse.id}`);
 };

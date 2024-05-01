@@ -3,6 +3,8 @@ import {
   IEvent,
   IEventAdminSessionResponse,
   IEventCreateResponse,
+  IEventEditInputs,
+  IEventEditResponse,
   IEventInputs,
   IParticipation,
   IParticipationCreate,
@@ -155,3 +157,81 @@ export const eventAdminSessionResponseSchema: ZodSchema<IEventAdminSessionRespon
     eventId: z.string(),
     adminToken: z.string(),
   });
+
+export const eventEditResponseSchema: ZodSchema<IEventEditResponse> = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  location: z.string(),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+  participantLimit: z.optional(z.coerce.number().int()),
+  participationStartsAt: z.coerce.date(),
+  participationEndsAt: z.coerce.date(),
+  visibility: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  expiresAt: z.coerce.date(),
+});
+
+export const getEventEditFormSchema = (
+  eventData: IEvent
+): ZodSchema<IEventEditInputs> =>
+  z
+    .object({
+      name: z
+        .string()
+        .min(1, "Name is required")
+        .max(50, "Name must be at most 50 characters long"),
+      description: z
+        .string()
+        .min(1, "Description is required")
+        .max(3000, "Description must be at most 3000 characters long"),
+      location: z
+        .string()
+        .min(1, "Location is required")
+        .max(100, "Location must be at most 100 characters long"),
+      startsAt: z.coerce
+        .date()
+        .refine(
+          (data) => data > eventData.createdAt,
+          "The event must start after its initial creation date and time"
+        ),
+      endsAt: z.coerce.date(),
+      hasParticipantLimit: z.coerce.boolean(),
+      participantLimit: z.optional(
+        z.coerce
+          .number()
+          .int("Participant limit must be an integer")
+          .gte(1, "Participant limit must be at least 1")
+          .lte(
+            Number.MAX_SAFE_INTEGER,
+            "Participant limit must be sensible (that is, at most 9,007,199,254,740,991)"
+          )
+      ),
+      participationStartsAt: z.coerce.date(),
+      participationEndsAt: z.coerce
+        .date()
+        .refine(
+          (data) => data > eventData.createdAt,
+          "Participation must end after the initial creation date and time of the event"
+        ),
+      visibility: z.enum(["public", "private"]),
+    })
+    .refine((data) => data.startsAt < data.endsAt, {
+      message: "The event must not end before it starts",
+      path: ["endsAt"],
+    })
+    .refine((data) => data.participationStartsAt < data.participationEndsAt, {
+      message: "Participation must not end before it starts",
+      path: ["participationEndsAt"],
+    })
+    .refine(
+      (data) =>
+        !data.hasParticipantLimit ||
+        (!!data.participantLimit && data.participantLimit >= 1),
+      {
+        message: "Participant limit must be a valid number",
+        path: ["maxParticipants"],
+      }
+    );
