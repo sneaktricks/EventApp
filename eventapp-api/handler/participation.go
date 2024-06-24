@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"example/eventapi/logger"
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"example/eventapi/store"
@@ -51,7 +52,7 @@ func (h *Handler) CreateParticipation(c echo.Context) error {
 
 	participation, err := h.participationStore.Create(c.Request().Context(), eventID, &participationCreate)
 	if err != nil {
-		slog.Error("failed to create participation", slog.String("error", err.Error()))
+		logger.Logger.Error("failed to create participation", slog.String("error", err.Error()))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create event")
 	}
 

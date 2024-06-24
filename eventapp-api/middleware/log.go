@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"example/eventapi/log"
+	"example/eventapi/logger"
 	"log/slog"
 
 	"github.com/labstack/echo/v4"
@@ -16,12 +16,12 @@ var LoggerMiddleware = middleware.RequestLoggerWithConfig(middleware.RequestLogg
 	HandleError: true,
 	LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
 		if v.Error == nil {
-			log.Logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
+			logger.Logger.LogAttrs(context.Background(), slog.LevelInfo, "REQUEST",
 				slog.String("uri", v.URI),
 				slog.Int("status", v.Status),
 			)
 		} else {
-			log.Logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
+			logger.Logger.LogAttrs(context.Background(), slog.LevelError, "REQUEST_ERROR",
 				slog.String("uri", v.URI), slog.Int("status", v.Status),
 				slog.String("error", v.Error.Error()),
 			)

@@ -5,11 +5,11 @@ import (
 	"example/eventapi/dal"
 	"example/eventapi/database"
 	"example/eventapi/handler"
+	"example/eventapi/logger"
 	"example/eventapi/router"
 	"example/eventapi/store"
 	"flag"
 	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -28,7 +28,8 @@ func main() {
 	mainGroup := r.Group("")
 	_, err := database.InitializeDB()
 	if err != nil {
-		log.Fatalf("Failed to initialize database: %s\n", err.Error())
+		logger.Logger.Error("Failed to initialize database", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 	eventStore := store.NewGormEventStore(dal.Q)
@@ -53,6 +54,6 @@ func listenForShutdownSignal(shutdownAction func()) {
 	signal.Notify(s, os.Interrupt, syscall.SIGTERM)
 	<-s
 
-	slog.Info("Shutdown signal received, shutting down...")
+	logger.Logger.Info("Shutdown signal received, shutting down...")
 	shutdownAction()
 }

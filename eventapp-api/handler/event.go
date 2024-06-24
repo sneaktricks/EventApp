@@ -2,6 +2,7 @@ package handler
 
 import (
 	"example/eventapi/auth/session"
+	"example/eventapi/logger"
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"example/eventapi/store"
@@ -57,7 +58,7 @@ func (h *Handler) CreateEvent(c echo.Context) error {
 
 	event, err := h.eventStore.Create(c.Request().Context(), &eventCreate)
 	if err != nil {
-		slog.Error("failed to create event", slog.String("error", err.Error()))
+		logger.Logger.Error("failed to create event", slog.String("error", err.Error()))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create event")
 	}
 
@@ -83,7 +84,7 @@ func (h *Handler) RequestEventAdminSession(c echo.Context) error {
 
 	adminToken, err := session.NewEventAdminSession(eventID)
 	if err != nil {
-		slog.Warn("Failed to generate event admin JWT token", slog.String("error", err.Error()))
+		logger.Logger.Error("Failed to generate event admin JWT token", slog.String("error", err.Error()))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to request event admin session")
 	}
 
