@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -40,7 +41,7 @@ func main() {
 	})
 
 	err = r.Start(fmt.Sprintf(":%d", *port))
-	if err != nil {
+	if err != http.ErrServerClosed {
 		r.Logger.Fatal(err)
 	}
 }
