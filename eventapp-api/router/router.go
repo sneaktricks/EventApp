@@ -1,15 +1,17 @@
 package router
 
 import (
+	"example/eventapi/middleware"
+
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echomiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func New() *echo.Echo {
 	e := echo.New()
-	e.Pre(middleware.RemoveTrailingSlash())
-	e.Use(middleware.Logger())
-	e.Use(middleware.BodyLimit("2M"))
+	e.Pre(echomiddleware.RemoveTrailingSlash())
+	e.Use(middleware.LoggerMiddleware)
+	e.Use(echomiddleware.BodyLimit("2M"))
 	e.Validator = NewValidator()
 
 	return e
