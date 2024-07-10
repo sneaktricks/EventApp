@@ -11,7 +11,7 @@ import { ActionResponse, deleteEvent, editEvent } from "@/app/lib/actions";
 import Checkbox from "@/app/components/common/input/Checkbox";
 import NumberInput from "@/app/components/common/input/NumberInput";
 import RadioGroup from "@/app/components/common/input/RadioGroup";
-import { ArrowPathIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { PaintBrushIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { getEventEditFormSchema } from "@/app/lib/schemas";
 import { AlertStyle, IEvent, IEventEditInputs } from "@/app/lib/definitions";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
@@ -177,7 +177,7 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
               <div>
                 <Button
                   type="submit"
-                  icon={<ArrowPathIcon />}
+                  icon={<PaintBrushIcon />}
                   label={isSubmitting ? "Updating..." : "Update"}
                   disabled={isSubmitting || isDeleting}
                 />

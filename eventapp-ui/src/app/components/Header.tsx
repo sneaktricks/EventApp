@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Button from "./common/Button";
-import { PencilIcon } from "@heroicons/react/24/solid";
+import { PaintBrushIcon } from "@heroicons/react/24/solid";
 
 const Header = () => {
   return (
@@ -14,10 +14,10 @@ const Header = () => {
         <div className="flex items-center justify-end flex-grow">
           <div className="flex items-center space-x-4">
             <Link href="/events/edit">
-              <Button label="Edit Event" icon={<PencilIcon />} />
+              <Button label="Edit Event" icon={<PaintBrushIcon />} />
             </Link>
             <Link href="/participations/edit">
-              <Button label="Edit Participation" icon={<PencilIcon />} />
+              <Button label="Edit Participation" icon={<PaintBrushIcon />} />
             </Link>
           </div>
         </div>
