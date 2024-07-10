@@ -31,7 +31,7 @@ func (h *Handler) FindEventByID(c echo.Context) error {
 
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+		return HTTPErrInvalidID
 	}
 	event, err := h.eventStore.FindByID(c.Request().Context(), id)
 	if err != nil {
@@ -98,7 +98,7 @@ func (h *Handler) EditEvent(c echo.Context) error {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+		return HTTPErrInvalidID
 	}
 
 	editData := model.EventEdit{}
@@ -129,7 +129,7 @@ func (h *Handler) DeleteEvent(c echo.Context) error {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+		return HTTPErrInvalidID
 	}
 
 	if tokenID, ok := c.Get("eventId").(uuid.UUID); !ok || tokenID != id {

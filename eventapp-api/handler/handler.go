@@ -3,8 +3,13 @@ package handler
 import (
 	"example/eventapi/middleware"
 	"example/eventapi/store"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
+)
+
+var (
+	HTTPErrInvalidID = echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
 )
 
 type Handler struct {

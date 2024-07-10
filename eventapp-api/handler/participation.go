@@ -17,7 +17,7 @@ func (h *Handler) FindParticipantsByEventID(c echo.Context) error {
 	idParam := c.Param("id")
 	eventID, err := uuid.Parse(idParam)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+		return HTTPErrInvalidID
 	}
 
 	queryParams := c.QueryParams()
@@ -40,7 +40,7 @@ func (h *Handler) CreateParticipation(c echo.Context) error {
 	idParam := c.Param("id")
 	eventID, err := uuid.Parse(idParam)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+		return HTTPErrInvalidID
 	}
 
 	participationCreate := model.ParticipationCreate{}
@@ -111,7 +111,7 @@ func (h *Handler) DeleteParticipation(c echo.Context) error {
 	idParam := c.Param("id")
 	id, err := uuid.Parse(idParam)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+		return HTTPErrInvalidID
 	}
 
 	if tokenID, ok := c.Get("participationId").(uuid.UUID); !ok || tokenID != id {
