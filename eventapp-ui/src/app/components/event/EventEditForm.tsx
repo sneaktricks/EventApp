@@ -7,13 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimeField from "@/app/components/common/input/DateTimeField";
 import Button from "@/app/components/common/Button";
 import { useEffect, useState } from "react";
-import { ActionResponse, editEvent } from "@/app/lib/actions";
+import { ActionResponse, deleteEvent, editEvent } from "@/app/lib/actions";
 import Checkbox from "@/app/components/common/input/Checkbox";
 import NumberInput from "@/app/components/common/input/NumberInput";
 import RadioGroup from "@/app/components/common/input/RadioGroup";
-import { SparklesIcon } from "@heroicons/react/24/solid";
+import { ArrowPathIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { getEventEditFormSchema } from "@/app/lib/schemas";
-import { IEvent, IEventEditInputs } from "@/app/lib/definitions";
+import { AlertStyle, IEvent, IEventEditInputs } from "@/app/lib/definitions";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 
 export interface EventEditFormProps {
@@ -29,6 +29,7 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
   const [submitResponse, setSubmitResponse] = useState<ActionResponse | null>(
     null
   );
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const onSubmitAction: SubmitHandler<IEventEditInputs> = async (data) => {
     setIsSubmitting(true);
@@ -48,6 +49,20 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
     setSubmitResponse(response);
     setIsSubmitting(false);
   };
+
+  const onDeleteAction = async () => {
+    setIsDeleting(true);
+    const confirmation = window.confirm(
+      "Are you sure you want to delete this event? This action is permanent and cannot be reversed."
+    );
+    if (!confirmation) {
+      setIsDeleting(false);
+      return;
+    }
+    await deleteEvent(eventData.id);
+    setIsDeleting(false);
+  };
+
   const hasParticipantLimitValue = form.watch("hasParticipantLimit", false);
   useEffect(() => {
     if (!hasParticipantLimitValue) form.unregister("participantLimit");
@@ -148,12 +163,26 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
             {...form.register("visibility")}
           />
           <div className="grid gap-1 my-2">
-            <Button
-              type="submit"
-              icon={<SparklesIcon />}
-              label={isSubmitting ? "Updating..." : "Update Event"}
-              disabled={isSubmitting}
-            />
+            <div className="grid grid-cols-2 place-content-between">
+              <div>
+                <Button
+                  type="button"
+                  alertStyle={AlertStyle.Error}
+                  icon={<XMarkIcon />}
+                  label={isDeleting ? "Deleting..." : "Delete"}
+                  onClick={onDeleteAction}
+                  disabled={isSubmitting || isDeleting}
+                />
+              </div>
+              <div>
+                <Button
+                  type="submit"
+                  icon={<ArrowPathIcon />}
+                  label={isSubmitting ? "Updating..." : "Update"}
+                  disabled={isSubmitting || isDeleting}
+                />
+              </div>
+            </div>
             {!!submitResponse && (
               <div className="flex flex-row space-x-1 grow items-center text-xs text-red-600">
                 <div className="h-4 w-4">

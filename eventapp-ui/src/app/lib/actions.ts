@@ -160,7 +160,10 @@ export const submitEventAdminCode = async (
   console.log(eventAdminSessionResponse);
   console.log(`token: ${eventAdminSessionResponse.adminToken}`);
 
-  cookies().set("event-auth-admin-token", eventAdminSessionResponse.adminToken);
+  cookies().set(
+    "eventApp_event_admin_token",
+    eventAdminSessionResponse.adminToken
+  );
   redirect(`/events/${eventAdminSessionResponse.eventId}/edit`);
 };
 
@@ -180,7 +183,7 @@ export const editEvent = async (
   editData: IEventEdit
 ): Promise<ActionResponse> => {
   try {
-    console.log(cookies().get("event-auth-admin-token"));
+    console.log(cookies().get("eventApp_event_admin_token"));
     const url = `${process.env.API_URL}/events/${eventId}/edit`;
     const resp = await fetch(url, {
       body: JSON.stringify(editData),
@@ -188,7 +191,7 @@ export const editEvent = async (
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${
-          cookies().get("event-auth-admin-token")?.value
+          cookies().get("eventApp_event_admin_token")?.value
         }`,
       },
     });
@@ -206,4 +209,33 @@ export const editEvent = async (
 
   revalidateTag("events");
   redirect(`/events/${eventId}`);
+};
+
+export const deleteEvent = async (eventId: string): Promise<ActionResponse> => {
+  try {
+    console.log(cookies().get("eventApp_event_admin_token"));
+    const url = `${process.env.API_URL}/events/${eventId}/delete`;
+    const resp = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+          cookies().get("eventApp_event_admin_token")?.value
+        }`,
+      },
+    });
+    if (!resp.ok) {
+      console.error(`DELETE ${url} returned a non-ok status code`);
+      return {
+        message:
+          "Failed to delete event: API responded with a non-ok status code",
+      };
+    }
+  } catch (e) {
+    console.error("Failed to create event", e);
+    return { message: "Failed to create event" };
+  }
+
+  revalidateTag("events");
+  redirect("/events");
 };
