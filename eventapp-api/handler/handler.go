@@ -28,5 +28,6 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 	eventGroup.POST("/:id/participate", h.CreateParticipation)
 	eventGroup.GET("/participant-counts", h.FindParticipantCountsByEventID)
 	eventGroup.GET("/request-admin-session-token", h.RequestEventAdminSession)
-	eventGroup.PUT("/:id/edit", h.EditEvent, middleware.JWTMiddleware)
+	eventGroup.PUT("/:id/edit", h.EditEvent, middleware.JWTEventMiddleware)
+	eventGroup.DELETE("/:id/delete", h.DeleteEvent, middleware.JWTEventMiddleware)
 }

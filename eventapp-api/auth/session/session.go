@@ -84,3 +84,61 @@ func VerifyEventAdminToken(tokenString string) (eventID uuid.UUID, err error) {
 
 	return eventID, err
 }
+
+func NewParticipationAdminSession(participationID uuid.UUID) (token string, err error) {
+	now := time.Now()
+
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
+		Issuer:    "EventAppAPI",
+		Audience:  jwt.ClaimStrings{"EventAppAPI"},
+		Subject:   fmt.Sprintf("Participation:%s", participationID.String()),
+		IssuedAt:  jwt.NewNumericDate(now),
+		NotBefore: jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(jwtExpiration)),
+	})
+
+	token, err = t.SignedString(secretKey)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func VerifyParticipationAdminToken(tokenString string) (eventID uuid.UUID, err error) {
+	// Parse token
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	},
+		// Ensure that the signing method, issuer, and audience are valid.
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Name}),
+		jwt.WithIssuer("EventAppAPI"),
+		jwt.WithAudience("EventAppAPI"),
+		jwt.WithLeeway(5*time.Second),
+	)
+
+	// Check if a parse error occurred
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	// Check for validity
+	if !token.Valid {
+		return uuid.UUID{}, ErrInvalidToken
+	}
+
+	// Check that the subject has the "Participation:" prefix
+	subject, err := token.Claims.GetSubject()
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	if !strings.HasPrefix(subject, "Participation:") {
+		return uuid.UUID{}, ErrInvalidToken
+	}
+
+	eventID, err = uuid.Parse(strings.TrimPrefix(subject, "Participation:"))
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	return eventID, err
+}

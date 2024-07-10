@@ -109,7 +109,7 @@ func (h *Handler) EditEvent(c echo.Context) error {
 	if err := c.Validate(editData); err != nil {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
-	if tokenID := c.Get("eventId"); tokenID != id {
+	if tokenID, ok := c.Get("eventId").(uuid.UUID); !ok || tokenID != id {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Path variable id and token subject don't match")
 	}
 
@@ -123,4 +123,28 @@ func (h *Handler) EditEvent(c echo.Context) error {
 		}
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *Handler) DeleteEvent(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+	}
+
+	if tokenID, ok := c.Get("eventId").(uuid.UUID); !ok || tokenID != id {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Path variable id and token subject don't match")
+	}
+
+	err = h.eventStore.Delete(c.Request().Context(), id)
+	if err != nil {
+		switch err {
+		case store.ErrEventNotFound:
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete event")
+		}
+	}
+	return c.NoContent(http.StatusNoContent)
+
 }

@@ -25,6 +25,7 @@ type EventStore interface {
 	Create(ctx context.Context, createData *model.EventCreate) (event model.EventCreateResponse, err error)
 	FindEventIDByAdminCode(ctx context.Context, adminCode string) (eventID uuid.UUID, err error)
 	Edit(ctx context.Context, eventID uuid.UUID, editData *model.EventEdit) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type GormEventStore struct {
@@ -191,4 +192,15 @@ func (es *GormEventStore) Edit(ctx context.Context, eventID uuid.UUID, editData 
 	}
 
 	return nil
+}
+
+func (es *GormEventStore) Delete(ctx context.Context, id uuid.UUID) error {
+	e := es.query.Event
+
+	result, err := e.WithContext(ctx).Where(e.ID.Eq(id)).Delete()
+	if result.RowsAffected > 0 {
+		return ErrEventNotFound
+	}
+
+	return err
 }

@@ -25,7 +25,7 @@ type ParticipationStore interface {
 	FindParticipantCountsByEventID(ctx context.Context, eventIDs uuid.UUIDs) (participationCounts map[uuid.UUID]int64, err error)
 	Create(ctx context.Context, eventID uuid.UUID, pc *model.ParticipationCreate) (participation model.ParticipationCreateResponse, err error)
 	FindParticipationIDByAdminCode(ctx context.Context, adminCode string) (participationID uuid.UUID, err error)
-	// Delete(ctx context.Context, id uuid.UUID, adminCode string) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type GormParticipationStore struct {
@@ -199,4 +199,15 @@ func (ps *GormParticipationStore) FindParticipationIDByAdminCode(ctx context.Con
 	}
 
 	return participation.ID, nil
+}
+
+func (ps *GormParticipationStore) Delete(ctx context.Context, id uuid.UUID) error {
+	p := ps.query.Participation
+
+	result, err := p.WithContext(ctx).Where(p.ID.Eq(id)).Delete()
+	if result.RowsAffected > 0 {
+		return ErrParticipationNotFound
+	}
+
+	return err
 }
