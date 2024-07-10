@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"example/eventapi/auth/session"
 	"example/eventapi/logger"
 	"example/eventapi/model"
 	"example/eventapi/model/query"
@@ -75,4 +76,57 @@ func (h *Handler) FindParticipantCountsByEventID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, participationCounts)
+}
+
+func (h *Handler) RequestParticipationAdminSession(c echo.Context) error {
+	header := c.Request().Header
+	adminCode := header.Get("Authorization")
+	if adminCode == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Authorization header must be present")
+	}
+
+	participationID, err := h.participationStore.FindParticipationIDByAdminCode(c.Request().Context(), adminCode)
+	if err != nil {
+		switch err {
+		case store.ErrParticipationNotFound:
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve participation")
+		}
+	}
+
+	adminToken, err := session.NewParticipationAdminSession(participationID)
+	if err != nil {
+		logger.Logger.Error("Failed to generate participation admin JWT token", slog.String("error", err.Error()))
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to request participation admin session")
+	}
+
+	return c.JSON(http.StatusOK, model.ParticipationAdminSessionResponse{
+		ParticipationID: participationID,
+		AdminToken:      adminToken,
+	})
+}
+
+func (h *Handler) DeleteParticipation(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "id must be a valid UUID")
+	}
+
+	if tokenID, ok := c.Get("participationId").(uuid.UUID); !ok || tokenID != id {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Path variable id and token subject don't match")
+	}
+
+	err = h.participationStore.Delete(c.Request().Context(), id)
+	if err != nil {
+		switch err {
+		case store.ErrParticipationNotFound:
+			return echo.NewHTTPError(http.StatusNotFound, err.Error())
+		default:
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete participation")
+		}
+	}
+	return c.NoContent(http.StatusNoContent)
+
 }

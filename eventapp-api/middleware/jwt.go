@@ -15,3 +15,12 @@ var JWTEventMiddleware = echojwt.WithConfig(echojwt.Config{
 	TokenLookup: "header:Authorization:Bearer ",
 	ContextKey:  "eventId",
 })
+
+var JWTParticipationMiddleware = echojwt.WithConfig(echojwt.Config{
+	ParseTokenFunc: func(c echo.Context, auth string) (interface{}, error) {
+		participationID, err := session.VerifyParticipationAdminToken(auth)
+		return participationID, err
+	},
+	TokenLookup: "header:Authorization:Bearer ",
+	ContextKey:  "participationId",
+})
