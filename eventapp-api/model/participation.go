@@ -51,11 +51,11 @@ type Participations struct {
 	ParticipantLimit *int64                  `json:"participantLimit"`
 }
 
-type ParticipantCountsQuery struct {
+type ParticipationCountsQuery struct {
 	EventIDs uuid.UUIDs `json:"eventIds" validate:"required,min=1"`
 }
 
-type EventParticipantCount struct {
+type EventParticipationCount struct {
 	EventID uuid.UUID
 	Count   int64
 }

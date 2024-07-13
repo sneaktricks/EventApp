@@ -29,9 +29,8 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 	eventGroup.GET("", h.FindAllEvents)
 	eventGroup.GET("/:id", h.FindEventByID)
 	eventGroup.POST("", h.CreateEvent)
-	eventGroup.GET("/:id/participants", h.FindParticipantsByEventID)
-	eventGroup.POST("/:id/participate", h.CreateParticipation)
-	eventGroup.GET("/participant-counts", h.FindParticipantCountsByEventID)
+	eventGroup.GET("/:id/participations", h.FindParticipationsByEventID)
+	eventGroup.POST("/:id/participations", h.CreateParticipation)
 	eventGroup.GET("/request-admin-session-token", h.RequestEventAdminSession)
 	eventGroup.PUT("/:id/edit", h.EditEvent, middleware.JWTEventMiddleware)
 	eventGroup.DELETE("/:id/delete", h.DeleteEvent, middleware.JWTEventMiddleware)
@@ -39,4 +38,5 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 	participationGroup := g.Group("/participations")
 	participationGroup.GET("/request-admin-session", h.RequestParticipationAdminSession)
 	participationGroup.DELETE("/:id", h.DeleteParticipation)
+	participationGroup.GET("/counts", h.FindParticipationCountsByEventID)
 }

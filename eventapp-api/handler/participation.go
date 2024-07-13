@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h *Handler) FindParticipantsByEventID(c echo.Context) error {
+func (h *Handler) FindParticipationsByEventID(c echo.Context) error {
 	idParam := c.Param("id")
 	eventID, err := uuid.Parse(idParam)
 	if err != nil {
@@ -29,7 +29,7 @@ func (h *Handler) FindParticipantsByEventID(c echo.Context) error {
 		case store.ErrEventNotFound:
 			return echo.NewHTTPError(http.StatusNotFound, err.Error())
 		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve participants")
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve participations")
 		}
 	}
 
@@ -60,9 +60,9 @@ func (h *Handler) CreateParticipation(c echo.Context) error {
 	return c.JSON(http.StatusCreated, participation)
 }
 
-func (h *Handler) FindParticipantCountsByEventID(c echo.Context) error {
+func (h *Handler) FindParticipationCountsByEventID(c echo.Context) error {
 
-	var query model.ParticipantCountsQuery
+	var query model.ParticipationCountsQuery
 	if err := c.Bind(&query); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -70,9 +70,9 @@ func (h *Handler) FindParticipantCountsByEventID(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	participationCounts, err := h.participationStore.FindParticipantCountsByEventID(c.Request().Context(), query.EventIDs)
+	participationCounts, err := h.participationStore.FindParticipationCountsByEventID(c.Request().Context(), query.EventIDs)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve participant counts")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve participation counts")
 	}
 
 	return c.JSON(http.StatusOK, participationCounts)

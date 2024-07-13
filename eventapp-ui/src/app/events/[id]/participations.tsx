@@ -1,12 +1,12 @@
 import ParticipationTable from "@/app/components/participation/ParticipationTable";
-import { fetchParticipantsByEventId } from "@/app/lib/data";
+import { fetchParticipantsByEventId as fetchParticipationsByEventId } from "@/app/lib/data";
 
 export interface ParticipationsProps {
   eventId: string;
 }
 
 const Participations = async ({ eventId }: ParticipationsProps) => {
-  const participations = await fetchParticipantsByEventId(eventId);
+  const participations = await fetchParticipationsByEventId(eventId);
 
   return (
     <div>

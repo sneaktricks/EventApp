@@ -22,7 +22,7 @@ var (
 
 type ParticipationStore interface {
 	FindAllInEvent(ctx context.Context, eventID uuid.UUID, params query.PaginationParams) (participations model.Participations, err error)
-	FindParticipantCountsByEventID(ctx context.Context, eventIDs uuid.UUIDs) (participationCounts map[uuid.UUID]int64, err error)
+	FindParticipationCountsByEventID(ctx context.Context, eventIDs uuid.UUIDs) (participationCounts map[uuid.UUID]int64, err error)
 	Create(ctx context.Context, eventID uuid.UUID, pc *model.ParticipationCreate) (participation model.ParticipationCreateResponse, err error)
 	FindParticipationIDByAdminCode(ctx context.Context, adminCode string) (participationID uuid.UUID, err error)
 	Delete(ctx context.Context, id uuid.UUID) error
@@ -142,7 +142,7 @@ func (ps *GormParticipationStore) Create(ctx context.Context, eventID uuid.UUID,
 	return participation, nil
 }
 
-func (ps *GormParticipationStore) FindParticipantCountsByEventID(ctx context.Context, eventIDs uuid.UUIDs) (participationCounts map[uuid.UUID]int64, err error) {
+func (ps *GormParticipationStore) FindParticipationCountsByEventID(ctx context.Context, eventIDs uuid.UUIDs) (participationCounts map[uuid.UUID]int64, err error) {
 	p := ps.query.Participation
 
 	// For some reason, the In method in the query doesn't accept (eventIDs...) as is,
@@ -152,7 +152,7 @@ func (ps *GormParticipationStore) FindParticipantCountsByEventID(ctx context.Con
 		ids = append(ids, id)
 	}
 
-	var participationCountSlice []model.EventParticipantCount
+	var participationCountSlice []model.EventParticipationCount
 	err = p.WithContext(ctx).
 		Select(p.EventID, p.ID.Count().As("count")).
 		Group(p.EventID).

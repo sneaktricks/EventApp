@@ -90,7 +90,7 @@ export const fetchParticipantsByEventId = async (
     if (!process.env.API_URL) {
       throw new Error("API_URL is not defined");
     }
-    const url = `${process.env.API_URL}/events/${eventId}/participants`;
+    const url = `${process.env.API_URL}/events/${eventId}/participations`;
     const resp = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
