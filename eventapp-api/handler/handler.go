@@ -37,6 +37,6 @@ func (h *Handler) RegisterRoutes(g *echo.Group) {
 
 	participationGroup := g.Group("/participations")
 	participationGroup.GET("/request-admin-session", h.RequestParticipationAdminSession)
-	participationGroup.DELETE("/:id", h.DeleteParticipation)
+	participationGroup.DELETE("/:id/delete", h.DeleteParticipation)
 	participationGroup.GET("/counts", h.FindParticipationCountsByEventID)
 }

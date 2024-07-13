@@ -239,3 +239,35 @@ export const deleteEvent = async (eventId: string): Promise<ActionResponse> => {
   revalidateTag("events");
   redirect("/events");
 };
+
+export const deleteParticipation = async (
+  participationId: string
+): Promise<ActionResponse> => {
+  try {
+    console.log(cookies().get("eventApp_participation_admin_token"));
+    const url = `${process.env.API_URL}/participations/${participationId}/delete`;
+    const resp = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+          cookies().get("eventApp_event_admin_token")?.value
+        }`,
+      },
+    });
+    if (!resp.ok) {
+      console.error(`DELETE ${url} returned a non-ok status code`);
+      return {
+        message:
+          "Failed to unparticipate: API responded with a non-ok status code",
+      };
+    }
+  } catch (e) {
+    console.error("Failed to unparticipate", e);
+    return { message: "Failed to unparticipate" };
+  }
+
+  revalidateTag("events");
+  revalidateTag("participations");
+  redirect("/events");
+};

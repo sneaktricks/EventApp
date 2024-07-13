@@ -97,7 +97,7 @@ export const fetchParticipantsByEventId = async (
       },
       next: {
         revalidate: 300,
-        tags: ["events"],
+        tags: ["events", "participations"],
       },
     });
     if (!resp.ok) {
