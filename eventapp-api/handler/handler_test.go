@@ -23,6 +23,7 @@ func pointer[T any](x T) *T {
 
 func NewTestHandler() (r *echo.Echo, h *handler.Handler) {
 	r = router.New()
+	g := r.Group("")
 
 	ps := MockParticipationStore{
 		participations: []model.Participation{
@@ -73,6 +74,7 @@ func NewTestHandler() (r *echo.Echo, h *handler.Handler) {
 	}
 
 	h = handler.New(&es, &ps)
+	h.RegisterRoutes(g)
 
 	return r, h
 }

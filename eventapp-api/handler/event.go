@@ -29,6 +29,7 @@ func (h *Handler) FindEventByID(c echo.Context) error {
 
 	id, err := uuid.Parse(idParam)
 	if err != nil {
+		logger.Logger.Warn("Failed to parse UUID", slog.String("error", err.Error()))
 		return HTTPErrInvalidID
 	}
 	event, err := h.eventStore.FindByID(c.Request().Context(), id)
