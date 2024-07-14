@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"example/eventapi/auth/session"
 	"example/eventapi/dal"
 	"example/eventapi/database"
 	"example/eventapi/handler"
@@ -23,6 +24,7 @@ var (
 
 func main() {
 	flag.Parse()
+	session.SetSecretKeyFromEnv()
 
 	r := router.New()
 	mainGroup := r.Group("")

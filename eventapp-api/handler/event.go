@@ -6,7 +6,6 @@ import (
 	"example/eventapi/model"
 	"example/eventapi/model/query"
 	"example/eventapi/store"
-	"log"
 	"log/slog"
 	"net/http"
 
@@ -22,7 +21,6 @@ func (h *Handler) FindAllEvents(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve events")
 	}
-	log.Printf("%#v\n", events)
 	return c.JSON(http.StatusOK, events)
 }
 

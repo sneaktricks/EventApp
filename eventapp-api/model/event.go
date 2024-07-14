@@ -25,6 +25,24 @@ type Event struct {
 	ParticipantCount      int64           `gorm:"default:0"`
 }
 
+func (e Event) EventResponse() EventResponse {
+	return EventResponse{
+		ID:                    e.ID,
+		Name:                  e.Name,
+		Description:           e.Description,
+		Location:              e.Location,
+		StartsAt:              e.StartsAt,
+		EndsAt:                e.EndsAt,
+		ParticipantLimit:      e.ParticipantLimit,
+		ParticipationStartsAt: e.ParticipationStartsAt,
+		ParticipationEndsAt:   e.ParticipationEndsAt,
+		Visibility:            e.Visibility,
+		ParticipantCount:      e.ParticipantCount,
+		CreatedAt:             e.CreatedAt,
+		UpdatedAt:             e.UpdatedAt,
+	}
+}
+
 type EventCreate struct {
 	Name                  string    `json:"name" validate:"required,max=50"`
 	Description           string    `json:"description" validate:"required,max=3000"`
@@ -36,6 +54,22 @@ type EventCreate struct {
 	ParticipationEndsAt   time.Time `json:"participationEndsAt" validate:"required,gte,gtfield=ParticipationStartsAt"`
 	Visibility            string    `json:"visibility" validate:"oneof=public private"`
 	ExpiresAt             time.Time `json:"expiresAt" validate:"required,gte"`
+}
+
+func (ec EventCreate) Event(adminCodeHash string) Event {
+	return Event{
+		Name:                  ec.Name,
+		Description:           ec.Description,
+		Location:              ec.Location,
+		StartsAt:              ec.StartsAt,
+		EndsAt:                ec.EndsAt,
+		ParticipantLimit:      ec.ParticipantLimit,
+		ParticipationStartsAt: ec.ParticipationStartsAt,
+		ParticipationEndsAt:   ec.ParticipationEndsAt,
+		Visibility:            ec.Visibility,
+		AdminCode:             adminCodeHash,
+		ExpiresAt:             ec.ExpiresAt,
+	}
 }
 
 type EventCreateResponse struct {

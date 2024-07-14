@@ -17,6 +17,18 @@ type Participation struct {
 	EventID   uuid.UUID
 }
 
+func (p Participation) ParticipationResponse() ParticipationResponse {
+	return ParticipationResponse{
+		ID:        p.ID,
+		FirstName: p.FirstName,
+		LastName:  p.LastName,
+		Email:     p.Email,
+		EventID:   p.EventID,
+		CreatedAt: p.CreatedAt,
+		UpdatedAt: p.UpdatedAt,
+	}
+}
+
 type ParticipationCreate struct {
 	FirstName string `json:"firstName" validate:"required,max=50"`
 	LastName  string `json:"lastName" validate:"required,max=50"`

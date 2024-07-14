@@ -14,11 +14,11 @@ import (
 
 const jwtExpiration = 1 * time.Hour
 
-var secretKey []byte
+var secretKey []byte = []byte("test secret")
 
 var ErrInvalidToken = errors.New("session: invalid token")
 
-func init() {
+func SetSecretKeyFromEnv() {
 	// Get session secret from env
 	secret, ok := os.LookupEnv("SESSION_SECRET")
 	if !ok {
