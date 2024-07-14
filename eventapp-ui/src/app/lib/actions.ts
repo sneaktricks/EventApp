@@ -214,7 +214,7 @@ export const editEvent = async (
 export const deleteEvent = async (eventId: string): Promise<ActionResponse> => {
   try {
     console.log(cookies().get("eventApp_event_admin_token"));
-    const url = `${process.env.API_URL}/events/${eventId}/delete`;
+    const url = `${process.env.API_URL}/events/${eventId}`;
     const resp = await fetch(url, {
       method: "DELETE",
       headers: {
@@ -245,7 +245,7 @@ export const deleteParticipation = async (
 ): Promise<ActionResponse> => {
   try {
     console.log(cookies().get("eventApp_participation_admin_token"));
-    const url = `${process.env.API_URL}/participations/${participationId}/delete`;
+    const url = `${process.env.API_URL}/participations/${participationId}`;
     const resp = await fetch(url, {
       method: "DELETE",
       headers: {
