@@ -47,11 +47,13 @@ func (ps *GormParticipationStore) FindAllInEvent(ctx context.Context, eventID uu
 		}
 	}
 
+	offset := (params.Page - 1) * params.Limit
+
 	p := ps.query.Participation
 	dbParticipations, _, err := p.WithContext(ctx).
 		Where(p.EventID.Eq(eventID)).
 		Order(p.CreatedAt.Asc()).
-		FindByPage((params.Page-1)*params.Limit, params.Limit)
+		FindByPage(offset, params.Limit)
 	if err != nil {
 		return model.Participations{}, err
 	}
@@ -72,7 +74,7 @@ func (ps *GormParticipationStore) FindAllInEvent(ctx context.Context, eventID uu
 			UpdatedAt: p.UpdatedAt,
 		}
 
-		if event.ParticipantLimit == nil || i < int(*event.ParticipantLimit) {
+		if event.ParticipantLimit == nil || i+offset < int(*event.ParticipantLimit) {
 			participations.InEvent = append(participations.InEvent, participation)
 		} else {
 			participations.InQueue = append(participations.InQueue, participation)
