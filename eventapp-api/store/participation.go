@@ -203,11 +203,29 @@ func (ps *GormParticipationStore) FindParticipationIDByAdminCode(ctx context.Con
 
 func (ps *GormParticipationStore) Delete(ctx context.Context, id uuid.UUID) error {
 	p := ps.query.Participation
+	e := ps.query.Event
 
-	result, err := p.WithContext(ctx).Where(p.ID.Eq(id)).Delete()
-	if result.RowsAffected > 0 {
-		return ErrParticipationNotFound
-	}
+	// Delete participation and decrement participant count in a transaction
+	err := ps.query.Transaction(func(tx *dal.Query) error {
+		participation, err := p.WithContext(ctx).Where(p.ID.Eq(id)).First()
+		if err != nil {
+			return err
+		}
+
+		if _, err := e.WithContext(ctx).Where(e.ID.Eq(participation.EventID)).UpdateSimple(e.ParticipantCount.Sub(1)); err != nil {
+			return err
+		}
+
+		result, err := p.WithContext(ctx).Delete(participation)
+		if err != nil {
+			return err
+		}
+		if result.RowsAffected > 0 {
+			return ErrParticipationNotFound
+		}
+
+		return nil
+	})
 
 	return err
 }
