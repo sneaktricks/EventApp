@@ -74,6 +74,10 @@ func (ps *GormParticipationStore) FindAllInEvent(ctx context.Context, eventID uu
 			UpdatedAt: p.UpdatedAt,
 		}
 
+		// Participations are added to the InEvent slice if the current index
+		// doesn't exceed the participant limit of the event. The current index
+		// is a sum of page index and offset.
+		// Otherwise, the participation is added to the InQueue slice.
 		if event.ParticipantLimit == nil || i+offset < int(*event.ParticipantLimit) {
 			participations.InEvent = append(participations.InEvent, participation)
 		} else {
