@@ -60,6 +60,14 @@ func InitializeDB() (db *gorm.DB, err error) {
 	}
 	log.Println("Database: Successfully connected to database")
 
+	// Configure connection pool limits
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+	sqlDB.SetMaxOpenConns(50)
+	sqlDB.SetMaxIdleConns(5)
+
 	autoMigrate(db)
 	dal.SetDefault(db)
 	dal.Use(db)

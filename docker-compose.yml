@@ -22,7 +22,7 @@ services:
     image: eventapp-ui
     build:
       context: ./eventapp-ui
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     environment:
       - API_URL=http://eventapp-api:8080
     ports:

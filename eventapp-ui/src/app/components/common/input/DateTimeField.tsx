@@ -30,4 +30,6 @@ const DateTimeField = React.forwardRef<HTMLInputElement, DateTimeFieldProps>(
   }
 );
 
+DateTimeField.displayName = "DateTimeField";
+
 export default DateTimeField;

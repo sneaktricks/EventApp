@@ -34,7 +34,6 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
   const onSubmitAction: SubmitHandler<IEventEditInputs> = async (data) => {
     setIsSubmitting(true);
     setSubmitResponse(null);
-    console.log(data);
     const response = await editEvent(eventData.id, {
       name: data.name,
       description: data.description,
@@ -67,7 +66,7 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
   useEffect(() => {
     if (!hasParticipantLimitValue) form.unregister("participantLimit");
     else form.register("participantLimit");
-  }, [hasParticipantLimitValue]);
+  }, [form, hasParticipantLimitValue]);
 
   return (
     <FormProvider {...form}>

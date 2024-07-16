@@ -29,7 +29,6 @@ const EventForm = () => {
   const onSubmitAction: SubmitHandler<IEventInputs> = async (data) => {
     setIsSubmitting(true);
     setSubmitResponse(null);
-    console.log(data);
     const response = await createEvent({
       name: data.name,
       description: data.description,
@@ -49,7 +48,7 @@ const EventForm = () => {
   useEffect(() => {
     if (!hasParticipantLimitValue) form.unregister("participantLimit");
     else form.register("participantLimit");
-  }, [hasParticipantLimitValue]);
+  }, [form, hasParticipantLimitValue]);
 
   return (
     <FormProvider {...form}>

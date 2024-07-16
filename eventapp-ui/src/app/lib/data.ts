@@ -23,7 +23,6 @@ export const fetchEvents = async (): Promise<readonly IEvent[]> => {
       throw new Error(`${url} returned a non-ok status code`);
     }
     const body = await resp.json();
-    console.log(body);
     const parseResult = z.array(eventResponseSchema).safeParse(body);
     if (!parseResult.success) {
       console.error(
@@ -32,7 +31,6 @@ export const fetchEvents = async (): Promise<readonly IEvent[]> => {
       );
       throw new Error("Failed to fetch events");
     }
-    console.log(parseResult.data);
 
     return parseResult.data;
   } catch (e) {

@@ -7,7 +7,7 @@ const NotFound = () => {
     <div className="text-center">
       <h1 className="text-2xl font-bold mb-5">404 - Event Not Found</h1>
       <p className="mb-1">
-        We couldn't find an event with the ID you provided.
+        We couldn&apos;t find an event with the ID you provided.
       </p>
       <Link href="/">
         <p className="text-blue-600 hover:text-blue-500 underline font-bold">

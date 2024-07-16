@@ -26,9 +26,9 @@ const AdminCodeInput = (props: AdminCodeInputProps) => {
   const [blocks, setBlocks] = useState(
     Array<string>(props.blockCount).fill("")
   );
-  const refs = Array.from({ length: props.blockCount }, () =>
-    useRef<HTMLInputElement>(null)
-  );
+
+  const refs = useRef<HTMLInputElement[]>([]);
+
   const [disabled, setDisabled] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -44,8 +44,8 @@ const AdminCodeInput = (props: AdminCodeInputProps) => {
   };
 
   useEffect(() => {
-    if (refs[0].current) {
-      refs[0].current.focus();
+    if (refs.current[0]) {
+      refs.current[0].focus();
     }
   }, []);
 
@@ -68,10 +68,6 @@ const AdminCodeInput = (props: AdminCodeInputProps) => {
       }
     });
 
-    // const newValue = event.target.value.
-    //   .slice(0, props.blockLength)
-    //   .toUpperCase();
-    // newBlocks[blockIndex] = newValue;
     setBlocks(newBlocks);
 
     if (newBlocks.every((b) => b.length === 6)) {
@@ -82,11 +78,13 @@ const AdminCodeInput = (props: AdminCodeInputProps) => {
     if (
       newBlocks[lastBlockIdx].length >= props.blockLength &&
       blockIndex < props.blockCount - 1 &&
-      refs[blockIndex + 1].current
+      refs.current[blockIndex + 1]
     ) {
-      refs[blockIndex + 1].current!.focus();
+      refs.current[blockIndex + 1].focus();
     }
   };
+
+  const keys = Array.from(Array(props.blockCount).keys());
 
   return (
     <div className="grid gap-10 justify-center">
@@ -98,7 +96,7 @@ const AdminCodeInput = (props: AdminCodeInputProps) => {
       )}
       <div className="flex items-center justify-center space-x-2">
         {blocks.map((block, index) => (
-          <div className="space-x-2" key={index}>
+          <div className="space-x-2" key={keys[index]}>
             <input
               type="text"
               className={clsx(
@@ -109,7 +107,9 @@ const AdminCodeInput = (props: AdminCodeInputProps) => {
               onChange={(e) => handleChange(index, e)}
               maxLength={props.blockLength * (props.blockCount + 1)}
               disabled={disabled}
-              ref={refs[index]}
+              ref={(ref) => {
+                refs.current[index] = ref!;
+              }}
             />
             {index < props.blockCount - 1 && (
               <span className="text-4xl">-</span>

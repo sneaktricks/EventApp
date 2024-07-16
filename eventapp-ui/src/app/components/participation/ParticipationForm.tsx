@@ -27,7 +27,6 @@ const ParticipationForm = (props: ParticipationFormProps) => {
   const onSubmitAction: SubmitHandler<IParticipationCreate> = async (data) => {
     setIsSubmitting(true);
     setSubmitResponse(null);
-    console.log(data);
     const response = await submitParticipation(props.eventId, {
       firstName: data.firstName,
       lastName: data.lastName,

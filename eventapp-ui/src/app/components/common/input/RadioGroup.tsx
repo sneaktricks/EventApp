@@ -50,4 +50,6 @@ const RadioGroup = React.forwardRef<HTMLInputElement, RadioGroupProps>(
   }
 );
 
+RadioGroup.displayName = "RadioGroup";
+
 export default RadioGroup;

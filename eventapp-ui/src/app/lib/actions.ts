@@ -24,7 +24,6 @@ export type ActionResponse = {
 export const createEvent = async (
   event: IEventCreate
 ): Promise<ActionResponse> => {
-  console.log(event);
   let eventCreateResponse: IEventCreateResponse;
   await new Promise((r) => setTimeout(r, 3000));
   try {
@@ -71,7 +70,6 @@ export const submitParticipation = async (
   eventId: string,
   participation: IParticipationCreate
 ): Promise<ActionResponse> => {
-  console.log(participation);
   let participationCreateResponse: IParticipationCreateResponse;
   await new Promise((r) => setTimeout(r, 3000));
   try {
@@ -157,9 +155,6 @@ export const submitEventAdminCode = async (
     return { message: "Failed to fetch event" };
   }
 
-  console.log(eventAdminSessionResponse);
-  console.log(`token: ${eventAdminSessionResponse.adminToken}`);
-
   cookies().set(
     "eventApp_event_admin_token",
     eventAdminSessionResponse.adminToken
@@ -170,7 +165,6 @@ export const submitEventAdminCode = async (
 export const submitParticipationAdminCode = async (
   code: string
 ): Promise<ActionResponse> => {
-  console.log(code);
   if (code === "123456-ABCDEF-123456") {
     return { message: "Success" };
   } else {
@@ -183,7 +177,6 @@ export const editEvent = async (
   editData: IEventEdit
 ): Promise<ActionResponse> => {
   try {
-    console.log(cookies().get("eventApp_event_admin_token"));
     const url = `${process.env.API_URL}/events/${eventId}/edit`;
     const resp = await fetch(url, {
       body: JSON.stringify(editData),
@@ -213,7 +206,6 @@ export const editEvent = async (
 
 export const deleteEvent = async (eventId: string): Promise<ActionResponse> => {
   try {
-    console.log(cookies().get("eventApp_event_admin_token"));
     const url = `${process.env.API_URL}/events/${eventId}`;
     const resp = await fetch(url, {
       method: "DELETE",
@@ -244,7 +236,6 @@ export const deleteParticipation = async (
   participationId: string
 ): Promise<ActionResponse> => {
   try {
-    console.log(cookies().get("eventApp_participation_admin_token"));
     const url = `${process.env.API_URL}/participations/${participationId}`;
     const resp = await fetch(url, {
       method: "DELETE",
