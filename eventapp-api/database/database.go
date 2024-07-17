@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	applogger "example/eventapi/logger"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,7 +19,36 @@ const restartAttempts = 5
 
 func autoMigrate(db *gorm.DB) {
 	db.AutoMigrate(&model.Event{}, &model.Participation{})
-	log.Println("Database: Migration complete")
+	applogger.Logger.Info("Database: Migration complete")
+
+	event1ParticipantLimit := int64(5)
+	db.Create(model.EventCreate{
+		Name:                  "Test Event 1",
+		Description:           "Welcome to Test Event 1!",
+		Location:              "Online",
+		StartsAt:              time.Now().Add(2 * 24 * time.Hour),
+		EndsAt:                time.Now().Add(2*24*time.Hour + 2*time.Hour),
+		ParticipantLimit:      &event1ParticipantLimit,
+		ParticipationStartsAt: time.Now().Add(-time.Hour),
+		ParticipationEndsAt:   time.Now().Add(24 * time.Hour),
+		Visibility:            "public",
+		ExpiresAt:             time.Now().Add(24 * time.Hour),
+	}.Event(""))
+
+	db.Create(model.EventCreate{
+		Name:                  "Meeting",
+		Description:           "Something spooky...",
+		Location:              "Here",
+		StartsAt:              time.Now().Add(10 * 24 * time.Hour),
+		EndsAt:                time.Now().Add(12 * 24 * time.Hour),
+		ParticipantLimit:      nil,
+		ParticipationStartsAt: time.Now().Add(3 * time.Minute),
+		ParticipationEndsAt:   time.Now().Add(9 * 24 * time.Hour),
+		Visibility:            "public",
+		ExpiresAt:             time.Now().Add(10 * 24 * time.Hour),
+	}.Event(""))
+
+	applogger.Logger.Info("Database: Initial events created")
 }
 
 var dbLogger = logger.New(
@@ -52,13 +83,15 @@ func InitializeDB() (db *gorm.DB, err error) {
 				return nil, err
 			}
 			waitDuration := time.Duration(2<<i) * time.Second
-			log.Printf("Database: Failed to connect to database. Re-attempting in %s\n", waitDuration)
+			applogger.Logger.Warn(
+				fmt.Sprintf("Database: Failed to connect to database. Re-attempting in %s\n", waitDuration),
+			)
 			time.Sleep(waitDuration)
 			continue
 		}
 		break
 	}
-	log.Println("Database: Successfully connected to database")
+	applogger.Logger.Info("Database: Successfully connected to database")
 
 	// Configure connection pool limits
 	sqlDB, err := db.DB()
