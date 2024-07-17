@@ -3,7 +3,7 @@ import EventListElement from "./EventListElement";
 import Link from "next/link";
 
 export interface EventListProps {
-  events: IEvent[];
+  events: readonly IEvent[];
 }
 
 const EventList = (props: EventListProps) => {

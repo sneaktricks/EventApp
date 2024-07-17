@@ -115,38 +115,6 @@ export const fetchParticipantsByEventId = async (
       throw new Error("Failed to fetch participations");
     }
 
-    for (let i = 0; i < 2000; i++) {
-      if (
-        !parseResult.data.participantLimit ||
-        parseResult.data.inEvent.length < parseResult.data.participantLimit
-      ) {
-        parseResult.data.inEvent = parseResult.data.inEvent.concat([
-          {
-            id: Math.floor(Math.random() * 10000).toString(),
-            firstName: `Test ${i}`,
-            lastName: "Tester",
-            email: "test@example.com",
-            eventId: eventId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
-      } else {
-        parseResult.data.inQueue = parseResult.data.inQueue.concat([
-          {
-            id: Math.floor(Math.random() * 10000).toString(),
-            firstName: `Test ${i}`,
-            lastName: "Tester",
-            email: "test@example.com",
-            eventId: eventId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
-      }
-      parseResult.data.participantCount++;
-    }
-
     return parseResult.data;
   } catch (e) {
     console.error("Failed to fetch participations", e);
