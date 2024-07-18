@@ -45,6 +45,7 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
       participantLimit: data.hasParticipantLimit ? data.participantLimit : null,
       visibility: data.visibility,
     });
+    window.alert(response.message);
     setSubmitResponse(response);
     setIsSubmitting(false);
   };

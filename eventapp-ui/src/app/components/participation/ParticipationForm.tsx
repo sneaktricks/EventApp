@@ -32,6 +32,7 @@ const ParticipationForm = (props: ParticipationFormProps) => {
       lastName: data.lastName,
       email: data.email,
     });
+    window.alert(response.message);
     setSubmitResponse(response);
     setIsSubmitting(false);
   };
@@ -67,7 +68,6 @@ const ParticipationForm = (props: ParticipationFormProps) => {
               label={isSubmitting ? "Submitting..." : "Submit"}
               disabled={isSubmitting}
             />
-            {/* TODO: Refine the submit response to an alert. */}
             {!!submitResponse && (
               <div className="flex flex-row space-x-1 grow items-center text-xs text-red-600">
                 <div className="h-4 w-4">
