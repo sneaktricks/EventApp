@@ -46,7 +46,10 @@ export const eventCreateFormSchema: ZodSchema<IEventInputs> = z
       (data) => data.getTime() > Date.now() + 1000 * 60, // minimum 1 minute in the future
       "Participation must end in the future"
     ),
-    visibility: z.enum(["public", "private"]),
+    visibility: z.enum(["public", "private"], {
+      invalid_type_error:
+        "Please select a visibility option (either public or private)",
+    }),
     expiresAt: z.coerce.date().refine(
       (data) => data.getTime() > Date.now() + 1000 * 60, // minimum 1 minute in the future
       "The event must expire in the future"
@@ -199,7 +202,10 @@ export const getEventEditFormSchema = (
           (data) => data > eventData.createdAt,
           "Participation must end after the initial creation date and time of the event"
         ),
-      visibility: z.enum(["public", "private"]),
+      visibility: z.enum(["public", "private"], {
+        invalid_type_error:
+          "Please select a visibility option (either public or private)",
+      }),
     })
     .refine((data) => data.startsAt < data.endsAt, {
       message: "The event must not end before it starts",
