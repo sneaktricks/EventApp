@@ -21,6 +21,12 @@ func pointer[T any](x T) *T {
 	return &x
 }
 
+var (
+	event1ID         = uuid.MustParse("00000000-0000-4000-8000-000000000000")
+	event2ID         = uuid.MustParse("00000000-0000-4000-8000-000000000002")
+	participation1ID = uuid.MustParse("00000000-0000-4000-8000-000000000001")
+)
+
 func NewTestHandler() (r *echo.Echo, h *handler.Handler) {
 	r = router.New()
 	g := r.Group("")
@@ -28,12 +34,12 @@ func NewTestHandler() (r *echo.Echo, h *handler.Handler) {
 	ps := MockParticipationStore{
 		participations: []model.Participation{
 			{
-				ID:        uuid.MustParse("00000000-0000-4000-8000-000000000001"),
+				ID:        participation1ID,
 				FirstName: "tester",
 				LastName:  "the best",
 				Email:     "test@example.com",
 				AdminCode: "testcode2",
-				EventID:   uuid.MustParse("00000000-0000-4000-8000-000000000002"),
+				EventID:   event2ID,
 			},
 		},
 	}
@@ -41,7 +47,7 @@ func NewTestHandler() (r *echo.Echo, h *handler.Handler) {
 	es := MockEventStore{
 		events: []model.Event{
 			{
-				ID:                    uuid.MustParse("00000000-0000-4000-8000-000000000000"),
+				ID:                    event1ID,
 				Name:                  "Event1",
 				Description:           "Desc1",
 				Location:              "Here",
@@ -56,7 +62,7 @@ func NewTestHandler() (r *echo.Echo, h *handler.Handler) {
 				AdminCode:             "testcode1",
 			},
 			{
-				ID:                    uuid.MustParse("00000000-0000-4000-8000-000000000002"),
+				ID:                    event2ID,
 				Name:                  "second event",
 				Description:           "second event description here",
 				Location:              "Somewhere",

@@ -9,7 +9,7 @@ export const fetchEvents = async (): Promise<readonly IEvent[]> => {
       throw new Error("API_URL is not defined");
     }
 
-    const url = `${process.env.API_URL}/events`;
+    const url = `${process.env.API_URL}/events?page=1&limit=25`;
     const resp = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +59,9 @@ export const fetchEventById = async (id: string): Promise<IEvent> => {
       if (resp.status === 404 || resp.status === 400) {
         notFound();
       }
-      console.error(`${url} returned a non-ok status code`);
+      console.error(
+        `${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       throw new Error("Failed to fetch event");
     }
     const body = await resp.json();

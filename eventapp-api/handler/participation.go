@@ -14,16 +14,31 @@ import (
 )
 
 func (h *Handler) FindParticipationsByEventID(c echo.Context) error {
-	idParam := c.Param("id")
-	eventID, err := uuid.Parse(idParam)
+	// Bind ID
+	var eventID uuid.UUID
+	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &eventID).BindError()
 	if err != nil {
-		return HTTPErrInvalidID
+		logger.Logger.Warn("Failed to bind ID", slog.String("error", err.Error()))
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	queryParams := c.QueryParams()
-	paginationParams := query.ParsePaginationParamsFromURLValues(queryParams)
+	// Bind and validate query params
+	queryParams := query.PaginationParams{}
+	if err := (&echo.DefaultBinder{}).BindQueryParams(c, &queryParams); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	if err := c.Validate(queryParams); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	// Set default param values if not defined
+	if queryParams.Limit == 0 {
+		queryParams.Limit = 25
+	}
+	if queryParams.Page == 0 {
+		queryParams.Page = 1
+	}
 
-	participations, err := h.participationStore.FindAllInEvent(c.Request().Context(), eventID, paginationParams)
+	participations, err := h.participationStore.FindAllInEvent(c.Request().Context(), eventID, queryParams)
 	if err != nil {
 		switch err {
 		case store.ErrEventNotFound:
@@ -61,7 +76,6 @@ func (h *Handler) CreateParticipation(c echo.Context) error {
 }
 
 func (h *Handler) FindParticipationCountsByEventID(c echo.Context) error {
-
 	var query model.ParticipationCountsQuery
 	if err := c.Bind(&query); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())

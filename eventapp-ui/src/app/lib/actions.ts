@@ -36,7 +36,9 @@ export const createEvent = async (
       },
     });
     if (!resp.ok) {
-      console.error(`POST ${url} returned a non-ok status code`);
+      console.error(
+        `POST ${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       return {
         message:
           "Failed to create event: API responded with a non-ok status code",
@@ -73,7 +75,7 @@ export const submitParticipation = async (
   let participationCreateResponse: IParticipationCreateResponse;
   await new Promise((r) => setTimeout(r, 3000));
   try {
-    const url = `${process.env.API_URL}/events/${eventId}/participate`;
+    const url = `${process.env.API_URL}/events/${eventId}/participations`;
     const resp = await fetch(url, {
       body: JSON.stringify(participation),
       method: "POST",
@@ -82,7 +84,9 @@ export const submitParticipation = async (
       },
     });
     if (!resp.ok) {
-      console.error(`POST ${url} returned a non-ok status code`);
+      console.error(
+        `POST ${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       return {
         message:
           "Failed to participate: API responded with a non-ok status code",
@@ -131,7 +135,9 @@ export const submitEventAdminCode = async (
           message: "No event was found by the provided code or it has expired",
         };
       }
-      console.error(`GET ${url} returned a non-ok status code`);
+      console.error(
+        `GET ${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       return {
         message:
           "Failed to participate: API responded with a non-ok status code",
@@ -189,7 +195,9 @@ export const editEvent = async (
       },
     });
     if (!resp.ok) {
-      console.error(`PUT ${url} returned a non-ok status code`);
+      console.error(
+        `PUT ${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       return {
         message:
           "Failed to create event: API responded with a non-ok status code",
@@ -217,7 +225,9 @@ export const deleteEvent = async (eventId: string): Promise<ActionResponse> => {
       },
     });
     if (!resp.ok) {
-      console.error(`DELETE ${url} returned a non-ok status code`);
+      console.error(
+        `DELETE ${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       return {
         message:
           "Failed to delete event: API responded with a non-ok status code",
@@ -247,7 +257,9 @@ export const deleteParticipation = async (
       },
     });
     if (!resp.ok) {
-      console.error(`DELETE ${url} returned a non-ok status code`);
+      console.error(
+        `DELETE ${url} returned a non-ok status code: ${resp.status}: ${resp.statusText}`
+      );
       return {
         message:
           "Failed to unparticipate: API responded with a non-ok status code",

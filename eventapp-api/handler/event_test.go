@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,17 +20,17 @@ func TestFindAllEvents(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(h.FindAllEvents(c)) {
+	if assert.NoError(h.FindEvents(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		var response []model.EventResponse
 		assert.NoError(json.Unmarshal(rec.Body.Bytes(), &response))
 
-		assert.Equal(uuid.MustParse("00000000-0000-4000-8000-000000000000"), response[0].ID)
+		assert.Equal(event1ID, response[0].ID)
 		assert.Equal("Event1", response[0].Name)
 		assert.NotNil(response[0].ParticipantLimit)
 		assert.EqualValues(20, *response[0].ParticipantLimit)
 
-		assert.Equal(uuid.MustParse("00000000-0000-4000-8000-000000000002"), response[1].ID)
+		assert.Equal(event2ID, response[1].ID)
 		assert.Equal("second event", response[1].Name)
 		assert.Equal("Somewhere", response[1].Location)
 		assert.Nil(response[1].ParticipantLimit)
@@ -54,7 +53,7 @@ func TestFindEventByID(t *testing.T) {
 		var response model.EventResponse
 		assert.NoError(json.Unmarshal(rec.Body.Bytes(), &response))
 
-		assert.Equal(uuid.MustParse("00000000-0000-4000-8000-000000000002"), response.ID)
+		assert.Equal(event2ID, response.ID)
 		assert.Equal("second event", response.Name)
 		assert.Nil(response.ParticipantLimit)
 	}

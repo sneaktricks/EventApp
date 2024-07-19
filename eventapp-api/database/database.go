@@ -5,6 +5,7 @@ import (
 	"example/eventapi/model"
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"os"
 	"time"
 
@@ -22,7 +23,7 @@ func autoMigrate(db *gorm.DB) {
 	applogger.Logger.Info("Database: Migration complete")
 
 	event1ParticipantLimit := int64(5)
-	db.Create(model.EventCreate{
+	event1 := model.EventCreate{
 		Name:                  "Test Event 1",
 		Description:           "Welcome to Test Event 1!",
 		Location:              "Online",
@@ -33,9 +34,10 @@ func autoMigrate(db *gorm.DB) {
 		ParticipationEndsAt:   time.Now().Add(24 * time.Hour),
 		Visibility:            "public",
 		ExpiresAt:             time.Now().Add(24 * time.Hour),
-	}.Event(""))
+	}.Event("")
+	db.Create(&event1)
 
-	db.Create(model.EventCreate{
+	event2 := model.EventCreate{
 		Name:                  "Meeting",
 		Description:           "Something spooky...",
 		Location:              "Here",
@@ -46,7 +48,26 @@ func autoMigrate(db *gorm.DB) {
 		ParticipationEndsAt:   time.Now().Add(9 * 24 * time.Hour),
 		Visibility:            "public",
 		ExpiresAt:             time.Now().Add(10 * 24 * time.Hour),
-	}.Event(""))
+	}.Event("")
+	db.Create(&event2)
+
+	for i := range 200 {
+		participantLimit := 1 + rand.Int64N(100)
+		event := model.EventCreate{
+			Name:                  fmt.Sprintf("Event %d", i+3),
+			Description:           fmt.Sprintf("Description %d", i+3),
+			Location:              "Somewhere",
+			StartsAt:              time.Now().Add(24 * time.Hour),
+			EndsAt:                time.Now().Add(25 * time.Hour),
+			ParticipantLimit:      &participantLimit,
+			ParticipationStartsAt: time.Now(),
+			ParticipationEndsAt:   time.Now().Add(24 * time.Hour),
+			Visibility:            "public",
+			ExpiresAt:             time.Now().Add(24 * time.Hour),
+		}.Event("")
+
+		db.Create(&event)
+	}
 
 	applogger.Logger.Info("Database: Initial events created")
 }
@@ -84,7 +105,7 @@ func InitializeDB() (db *gorm.DB, err error) {
 			}
 			waitDuration := time.Duration(2<<i) * time.Second
 			applogger.Logger.Warn(
-				fmt.Sprintf("Database: Failed to connect to database. Re-attempting in %s\n", waitDuration),
+				fmt.Sprintf("Database: Failed to connect to database. Re-attempting in %s", waitDuration),
 			)
 			time.Sleep(waitDuration)
 			continue

@@ -5,9 +5,9 @@ WORKDIR /go/src/app
 
 COPY . .
 
-RUN go get -d -v ./...
+RUN go get -d -v .
 
-RUN go build -o /go/bin/app/ -v ./...
+RUN go build -o /go/bin/app/ -v .
 
 #final stage
 FROM alpine:3.19.1

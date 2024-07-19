@@ -26,7 +26,7 @@ func New(es store.EventStore, ps store.ParticipationStore) *Handler {
 
 func (h *Handler) RegisterRoutes(g *echo.Group) {
 	eventGroup := g.Group("/events")
-	eventGroup.GET("", h.FindAllEvents)
+	eventGroup.GET("", h.FindEvents)
 	eventGroup.GET("/:id", h.FindEventByID)
 	eventGroup.POST("", h.CreateEvent)
 	eventGroup.GET("/:id/participations", h.FindParticipationsByEventID)

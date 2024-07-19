@@ -6,8 +6,8 @@ import (
 )
 
 type PaginationParams struct {
-	Page  int
-	Limit int
+	Page  int `query:"page" validate:"omitempty,min=1"`
+	Limit int `query:"limit" validate:"omitempty,min=1"`
 }
 
 // Parses PaginationParams from [url.Values].

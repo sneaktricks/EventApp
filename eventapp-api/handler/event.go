@@ -13,11 +13,25 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h *Handler) FindAllEvents(c echo.Context) error {
-	queryParams := c.QueryParams()
-	paginationParams := query.ParsePaginationParamsFromURLValues(queryParams)
+func (h *Handler) FindEvents(c echo.Context) error {
+	// Bind and validate query params
+	queryParams := query.PaginationParams{}
+	if err := (&echo.DefaultBinder{}).BindQueryParams(c, &queryParams); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	if err := c.Validate(queryParams); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	// Set default param values if not defined
+	if queryParams.Limit == 0 {
+		queryParams.Limit = 25
+	}
+	if queryParams.Page == 0 {
+		queryParams.Page = 1
+	}
 
-	events, err := h.eventStore.FindAll(c.Request().Context(), paginationParams)
+	// Retrieve events
+	events, err := h.eventStore.FindAll(c.Request().Context(), queryParams)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve events")
 	}
@@ -25,13 +39,15 @@ func (h *Handler) FindAllEvents(c echo.Context) error {
 }
 
 func (h *Handler) FindEventByID(c echo.Context) error {
-	idParam := c.Param("id")
-
-	id, err := uuid.Parse(idParam)
+	// Bind ID
+	var id uuid.UUID
+	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
 	if err != nil {
-		logger.Logger.Warn("Failed to parse UUID", slog.String("error", err.Error()))
-		return HTTPErrInvalidID
+		logger.Logger.Warn("Failed to bind ID", slog.String("error", err.Error()))
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
+
+	// Find event by ID
 	event, err := h.eventStore.FindByID(c.Request().Context(), id)
 	if err != nil {
 		switch err {
