@@ -15,6 +15,7 @@ import { PaintBrushIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { getEventEditFormSchema } from "@/app/lib/schemas";
 import { AlertStyle, IEvent, IEventEditInputs } from "@/app/lib/definitions";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
+import OutlinedButton from "../common/OutlinedButton";
 
 export interface EventEditFormProps {
   eventData: IEvent;
@@ -162,26 +163,22 @@ const EventEditForm = ({ eventData }: EventEditFormProps) => {
             }}
             {...form.register("visibility")}
           />
-          <div className="grid gap-1 my-2">
-            <div className="grid grid-cols-2 place-content-between">
-              <div>
-                <Button
-                  type="button"
-                  alertStyle={AlertStyle.Error}
-                  icon={<XMarkIcon />}
-                  label={isDeleting ? "Deleting..." : "Delete"}
-                  onClick={onDeleteAction}
-                  disabled={isSubmitting || isDeleting}
-                />
-              </div>
-              <div>
-                <Button
-                  type="submit"
-                  icon={<PaintBrushIcon />}
-                  label={isSubmitting ? "Updating..." : "Update"}
-                  disabled={isSubmitting || isDeleting}
-                />
-              </div>
+          <div className="flex items-center justify-end flex-grow">
+            <div className="flex items-center space-x-4">
+              <OutlinedButton
+                type="button"
+                alertStyle={AlertStyle.Error}
+                icon={<XMarkIcon />}
+                label={isDeleting ? "Deleting..." : "Delete"}
+                onClick={onDeleteAction}
+                disabled={isSubmitting || isDeleting}
+              />
+              <Button
+                type="submit"
+                icon={<PaintBrushIcon />}
+                label={isSubmitting ? "Updating..." : "Update"}
+                disabled={isSubmitting || isDeleting}
+              />
             </div>
             {!!submitResponse && (
               <div className="flex flex-row space-x-1 grow items-center text-xs text-red-600">

@@ -6,7 +6,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8">New Event</h1>
+      <h1 className="text-4xl font-bold mb-8">Edit Event</h1>
       <EventEditForm eventData={eventData} />
     </div>
   );
