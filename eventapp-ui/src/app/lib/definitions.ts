@@ -130,3 +130,9 @@ export interface IEventEditInputs {
   participationEndsAt: Date;
   visibility: EventVisibility;
 }
+
+export interface IEventsQuery {
+  page: number;
+  limit: number;
+  includeAlreadyStartedEvents: boolean;
+}

@@ -1,15 +1,30 @@
+"use server";
+
 import { z } from "zod";
-import { IEvent, IParticipations } from "./definitions";
-import { eventResponseSchema, participationsResponseSchema } from "./schemas";
+import { IEvent, IEventsQuery, IParticipations } from "./definitions";
+import {
+  eventResponseSchema,
+  eventsQuerySchema,
+  participationsResponseSchema,
+} from "./schemas";
 import { notFound } from "next/navigation";
 
-export const fetchEvents = async (): Promise<readonly IEvent[]> => {
+export const fetchEvents = async (
+  query: Partial<IEventsQuery> = {}
+): Promise<readonly IEvent[]> => {
+  const parseResult = eventsQuerySchema.safeParse(query);
+  if (!parseResult.success) {
+    console.error("Invalid query", parseResult.error);
+    throw new Error("Invalid query");
+  }
+  const { page, limit } = parseResult.data;
+
   try {
     if (!process.env.API_URL) {
       throw new Error("API_URL is not defined");
     }
 
-    const url = `${process.env.API_URL}/events?page=1&limit=25`;
+    const url = `${process.env.API_URL}/events?page=${page}&limit=${limit}`;
     const resp = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
