@@ -5,6 +5,7 @@ import {
   IEventCreateResponse,
   IEventEditInputs,
   IEventInputs,
+  IEventsQuery,
   IParticipation,
   IParticipationCreate,
   IParticipationCreateResponse,
@@ -224,3 +225,9 @@ export const getEventEditFormSchema = (
         path: ["maxParticipants"],
       }
     );
+
+export const eventsQuerySchema: ZodSchema<Partial<IEventsQuery>> = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().default(25),
+  includeAlreadyStartedEvents: z.coerce.boolean().default(false),
+});
