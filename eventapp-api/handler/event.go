@@ -5,7 +5,6 @@ import (
 	"example/eventapi/logger"
 	"example/eventapi/model"
 	"example/eventapi/model/query"
-	"example/eventapi/store"
 	"log/slog"
 	"net/http"
 
@@ -17,10 +16,10 @@ func (h *Handler) FindEvents(c echo.Context) error {
 	// Bind and validate query params
 	queryParams := query.PaginationParams{}
 	if err := (&echo.DefaultBinder{}).BindQueryParams(c, &queryParams); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return HTTPError(err)
 	}
 	if err := c.Validate(queryParams); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return HTTPError(err)
 	}
 	// Set default param values if not defined
 	if queryParams.Limit == 0 {
@@ -33,7 +32,7 @@ func (h *Handler) FindEvents(c echo.Context) error {
 	// Retrieve events
 	events, err := h.eventStore.FindAll(c.Request().Context(), queryParams)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve events")
+		return HTTPError(err)
 	}
 	return c.JSON(http.StatusOK, events)
 }
@@ -44,18 +43,13 @@ func (h *Handler) FindEventByID(c echo.Context) error {
 	err := echo.PathParamsBinder(c).TextUnmarshaler("id", &id).BindError()
 	if err != nil {
 		logger.Logger.Warn("Failed to bind ID", slog.String("error", err.Error()))
-		return echo.NewHTTPError(http.StatusBadRequest, err)
+		return HTTPError(err)
 	}
 
 	// Find event by ID
 	event, err := h.eventStore.FindByID(c.Request().Context(), id)
 	if err != nil {
-		switch err {
-		case store.ErrEventNotFound:
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve event")
-		}
+		return HTTPError(err)
 	}
 
 	return c.JSON(http.StatusOK, event)
@@ -65,16 +59,16 @@ func (h *Handler) CreateEvent(c echo.Context) error {
 	eventCreate := model.EventCreate{}
 
 	if err := c.Bind(&eventCreate); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return HTTPError(err)
 	}
 	if err := c.Validate(eventCreate); err != nil {
-		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+		return HTTPError(err)
 	}
 
 	event, err := h.eventStore.Create(c.Request().Context(), &eventCreate)
 	if err != nil {
-		logger.Logger.Error("failed to create event", slog.String("error", err.Error()))
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create event")
+		logger.Logger.Error("Failed to create event", slog.String("error", err.Error()))
+		return HTTPError(err)
 	}
 
 	return c.JSON(http.StatusCreated, event)
@@ -89,12 +83,7 @@ func (h *Handler) RequestEventAdminSession(c echo.Context) error {
 
 	eventID, err := h.eventStore.FindEventIDByAdminCode(c.Request().Context(), adminCode)
 	if err != nil {
-		switch err {
-		case store.ErrEventNotFound:
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to retrieve event")
-		}
+		return HTTPError(err)
 	}
 
 	adminToken, err := session.NewEventAdminSession(eventID)
@@ -119,10 +108,10 @@ func (h *Handler) EditEvent(c echo.Context) error {
 	editData := model.EventEdit{}
 
 	if err := c.Bind(&editData); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return HTTPError(err)
 	}
 	if err := c.Validate(editData); err != nil {
-		return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
+		return HTTPError(err)
 	}
 	if tokenID, ok := c.Get("eventId").(uuid.UUID); !ok || tokenID != id {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Path variable id and token subject don't match")
@@ -130,13 +119,9 @@ func (h *Handler) EditEvent(c echo.Context) error {
 
 	err = h.eventStore.Edit(c.Request().Context(), id, &editData)
 	if err != nil {
-		switch err {
-		case store.ErrEventNotFound:
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to edit event")
-		}
+		return HTTPError(err)
 	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
@@ -153,13 +138,8 @@ func (h *Handler) DeleteEvent(c echo.Context) error {
 
 	err = h.eventStore.Delete(c.Request().Context(), id)
 	if err != nil {
-		switch err {
-		case store.ErrEventNotFound:
-			return echo.NewHTTPError(http.StatusNotFound, err.Error())
-		default:
-			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete event")
-		}
+		return HTTPError(err)
 	}
-	return c.NoContent(http.StatusNoContent)
 
+	return c.NoContent(http.StatusNoContent)
 }
