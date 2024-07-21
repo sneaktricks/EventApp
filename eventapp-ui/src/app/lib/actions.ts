@@ -45,7 +45,7 @@ export const createEvent = async (
       };
     }
     const body = await resp.json();
-    const parseResult = eventCreateResponseSchema.safeParse(body);
+    const parseResult = await eventCreateResponseSchema.safeParseAsync(body);
     if (!parseResult.success) {
       console.error(
         "Received a malformed event create response",
@@ -93,7 +93,9 @@ export const submitParticipation = async (
       };
     }
     const body = await resp.json();
-    const parseResult = participationCreateResponseSchema.safeParse(body);
+    const parseResult = await participationCreateResponseSchema.safeParseAsync(
+      body
+    );
     if (!parseResult.success) {
       console.error(
         "Received a malformed participation response",
@@ -144,7 +146,9 @@ export const submitEventAdminCode = async (
       };
     }
     const body = await resp.json();
-    const parseResult = eventAdminSessionResponseSchema.safeParse(body);
+    const parseResult = await eventAdminSessionResponseSchema.safeParseAsync(
+      body
+    );
     if (!parseResult.success) {
       console.error(
         "Received a malformed event admin session response",

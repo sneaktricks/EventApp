@@ -3,6 +3,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import Events from "./events";
 import { Suspense } from "react";
+import EventListSkeleton from "@/app/components/event/EventListSkeleton";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ const Home = () => {
         </Link>
       </div>
       <div className="my-5">
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<EventListSkeleton />}>
           <Events />
         </Suspense>
       </div>
