@@ -1,7 +1,5 @@
-import { fetchEvents } from "./lib/data";
-import EventList from "./components/event/EventList";
-
-export const dynamic = "force-dynamic";
+import { fetchEvents } from "@/app/lib/data";
+import EventList from "@/app/components/event/EventList";
 
 const Events = async () => {
   const events = await fetchEvents({ page: 1, limit: 25 });
