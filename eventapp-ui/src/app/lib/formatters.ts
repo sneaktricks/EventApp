@@ -4,6 +4,8 @@ export const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
   hour12: false,
 });
 
+export const timeZone = dateTimeFormat.resolvedOptions().timeZone;
+
 export const numberFormat = new Intl.NumberFormat("en-US");
 
 const relTimeFormat = new Intl.RelativeTimeFormat("en-US", {

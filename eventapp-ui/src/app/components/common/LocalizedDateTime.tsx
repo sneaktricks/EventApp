@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import useHydration from "@/app/components/common/hooks/useHydration";
-import { dateTimeFormat } from "@/app/lib/formatters";
+import { dateTimeFormat, timeZone } from "@/app/lib/formatters";
 
 export interface LocalizedDateTimeProps {
   timestamp: number;
@@ -13,7 +13,7 @@ const LocalizedDateTime = ({ timestamp }: LocalizedDateTimeProps) => {
   return (
     <Suspense key={hydrated ? "local" : "server"}>
       {dateTimeFormat.format(timestamp)}
-      {hydrated ? "" : " [Server Time]"}
+      {hydrated ? "" : ` (${timeZone})`}
     </Suspense>
   );
 };
