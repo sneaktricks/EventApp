@@ -26,10 +26,12 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       - API_URL=http://eventapp-api:8080
-    ports:
-      - 3000:3000
+    expose:
+      - 3000
     depends_on:
       - eventapp-api
+    deploy:
+      replicas: 1
   nginx:
     image: nginx:latest
     volumes:

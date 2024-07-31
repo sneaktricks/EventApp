@@ -114,7 +114,7 @@ export const submitParticipation = async (
 
   revalidateTag("events");
   redirect(
-    `/events/${eventId}/participate/success?adminCode=${participationCreateResponse.adminCode}`
+    `/events/${eventId}/participate/success?eventId=${eventId}&adminCode=${participationCreateResponse.adminCode}`
   );
 };
 
