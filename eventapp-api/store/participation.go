@@ -91,7 +91,7 @@ func (ps *GormParticipationStore) FindAllInEvent(ctx context.Context, eventID uu
 
 func (ps *GormParticipationStore) Create(ctx context.Context, eventID uuid.UUID, pc *model.ParticipationCreate) (participation model.ParticipationCreateResponse, err error) {
 	e := ps.query.Event
-	_, err = e.WithContext(ctx).Where(e.ID.Eq(eventID)).First()
+	event, err := e.WithContext(ctx).Where(e.ID.Eq(eventID)).First()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return model.ParticipationCreateResponse{}, ErrEventNotFound
@@ -143,6 +143,14 @@ func (ps *GormParticipationStore) Create(ctx context.Context, eventID uuid.UUID,
 		EventID:   dbParticipation.EventID,
 		CreatedAt: dbParticipation.CreatedAt,
 		UpdatedAt: dbParticipation.UpdatedAt,
+	}
+
+	// Compute position in event. Could be more robust.
+	if pos := event.ParticipantCount + 1; event.ParticipantLimit == nil || pos <= *event.ParticipantLimit {
+		participation.PositionInEvent = &pos
+	} else {
+		pos = pos - *event.ParticipantLimit
+		participation.PositionInQueue = &pos
 	}
 
 	return participation, nil

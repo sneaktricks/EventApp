@@ -112,10 +112,17 @@ export const submitParticipation = async (
     return { message: "Failed to participate" };
   }
 
+  const { adminCode, positionInEvent, positionInQueue } =
+    participationCreateResponse;
+
+  const position =
+    positionInEvent !== null
+      ? `positionInEvent=${positionInEvent}`
+      : `positionInQueue=${positionInQueue}`;
+  const redirectUrl = `/events/${eventId}/participate/success?eventId=${eventId}&adminCode=${adminCode}&${position}`;
+
   revalidateTag("events");
-  redirect(
-    `/events/${eventId}/participate/success?eventId=${eventId}&adminCode=${participationCreateResponse.adminCode}`
-  );
+  redirect(redirectUrl);
 };
 
 export const submitEventAdminCode = async (

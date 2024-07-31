@@ -6,7 +6,7 @@ export interface IEvent {
   startsAt: Date;
   endsAt: Date;
   participantCount: number;
-  participantLimit?: number | null;
+  participantLimit: number | null;
   participationStartsAt: Date;
   participationEndsAt: Date;
   visibility: string;
@@ -81,7 +81,7 @@ export interface IParticipations {
   inEvent: readonly IParticipation[];
   inQueue: readonly IParticipation[];
   participantCount: number;
-  participantLimit?: number | null;
+  participantLimit: number | null;
 }
 
 export interface IParticipationCreate {
@@ -99,6 +99,8 @@ export interface IParticipationCreateResponse {
   eventId: string;
   createdAt: Date;
   updatedAt: Date;
+  positionInEvent: number | null;
+  positionInQueue: number | null;
 }
 
 export interface IEventAdminSessionResponse {

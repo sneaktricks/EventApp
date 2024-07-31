@@ -123,7 +123,7 @@ export const participationsResponseSchema: ZodSchema<IParticipations> =
     inEvent: z.array(participationSchema),
     inQueue: z.array(participationSchema),
     participantCount: z.coerce.number().int(),
-    participantLimit: z.optional(z.coerce.number().int()),
+    participantLimit: z.nullable(z.coerce.number().int()),
   });
 
 export const participationCreateSchema: ZodSchema<IParticipationCreate> =
@@ -153,6 +153,8 @@ export const participationCreateResponseSchema: ZodSchema<IParticipationCreateRe
     adminCode: z.string(),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
+    positionInEvent: z.nullable(z.coerce.number().int()),
+    positionInQueue: z.nullable(z.coerce.number().int()),
   });
 
 export const eventAdminSessionResponseSchema: ZodSchema<IEventAdminSessionResponse> =

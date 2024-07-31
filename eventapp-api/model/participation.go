@@ -36,14 +36,16 @@ type ParticipationCreate struct {
 }
 
 type ParticipationCreateResponse struct {
-	ID        uuid.UUID `json:"id"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	AdminCode string    `json:"adminCode"`
-	EventID   uuid.UUID `json:"eventId"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID              uuid.UUID `json:"id"`
+	FirstName       string    `json:"firstName"`
+	LastName        string    `json:"lastName"`
+	Email           string    `json:"email"`
+	AdminCode       string    `json:"adminCode"`
+	EventID         uuid.UUID `json:"eventId"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+	PositionInEvent *int64    `json:"positionInEvent"`
+	PositionInQueue *int64    `json:"positionInQueue"`
 }
 
 type ParticipationResponse struct {
