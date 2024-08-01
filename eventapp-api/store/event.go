@@ -43,6 +43,7 @@ func (es *GormEventStore) FindAll(ctx context.Context, params query.PaginationPa
 
 	dbEvents, _, err := e.WithContext(ctx).
 		Where(e.Visibility.Eq("public")).
+		Order(e.StartsAt.Asc()).
 		FindByPage((params.Page-1)*params.Limit, params.Limit)
 	if err != nil {
 		return nil, err
