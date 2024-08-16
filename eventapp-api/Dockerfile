@@ -1,5 +1,5 @@
 #build stage
-FROM golang:1.22-alpine3.19 AS builder
+FROM golang:1.23-alpine3.20 AS builder
 
 WORKDIR /go/src/app
 
@@ -10,7 +10,7 @@ RUN go get -d -v .
 RUN go build -o /go/bin/app/ -v .
 
 #final stage
-FROM alpine:3.19.1
+FROM alpine:3.20
 
 COPY --from=builder /go/bin/app/ /app/
 
