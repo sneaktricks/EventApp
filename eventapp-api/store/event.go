@@ -199,7 +199,7 @@ func (es *GormEventStore) Delete(ctx context.Context, id uuid.UUID) error {
 	e := es.query.Event
 
 	result, err := e.WithContext(ctx).Where(e.ID.Eq(id)).Delete()
-	if result.RowsAffected > 0 {
+	if result.RowsAffected == 0 {
 		return ErrEventNotFound
 	}
 
